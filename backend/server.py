@@ -631,8 +631,6 @@ async def get_student_progress(student_id: str, current_user: User = Depends(get
         exam = exams_map.get(attempt["exam_id"])
         if not exam:
             continue  # Skip if exam not found
-    for attempt in attempts:
-        exam = await db.exams.find_one({"id": attempt["exam_id"]}, {"_id": 0, "month": 1, "title": 1})
         
         # Find corresponding Paper 2
         paper2 = next((p for p in paper2_subs if p["exam_id"] == attempt["exam_id"]), None)

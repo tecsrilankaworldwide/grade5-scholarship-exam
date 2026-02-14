@@ -666,10 +666,10 @@ async def startup_event():
         
         # Seed sample users if they don't exist
         sample_users = [
-            {"id": "student_001", "email": "student@test.com", "full_name": "Sample Student", "password": get_password_hash("student123"), "role": "student", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True},
-            {"id": "teacher_001", "email": "teacher@test.com", "full_name": "Sample Teacher", "password": get_password_hash("teacher123"), "role": "teacher", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True},
-            {"id": "parent_001", "email": "parent@test.com", "full_name": "Sample Parent", "password": get_password_hash("parent123"), "role": "parent", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True, "linked_student_id": "student_001"},
-            {"id": "admin_001", "email": "admin@test.com", "full_name": "Sample Admin", "password": get_password_hash("admin123"), "role": "admin", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True}
+            {"id": "student_001", "email": "student@test.com", "full_name": "Sample Student", "hashed_password": get_password_hash("student123"), "role": "student", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True},
+            {"id": "teacher_001", "email": "teacher@test.com", "full_name": "Sample Teacher", "hashed_password": get_password_hash("teacher123"), "role": "teacher", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True},
+            {"id": "parent_001", "email": "parent@test.com", "full_name": "Sample Parent", "hashed_password": get_password_hash("parent123"), "role": "parent", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True, "linked_student_id": "student_001"},
+            {"id": "admin_001", "email": "admin@test.com", "full_name": "Sample Admin", "hashed_password": get_password_hash("admin123"), "role": "admin", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True}
         ]
         
         for user in sample_users:

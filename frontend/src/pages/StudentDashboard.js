@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth, API } from '../AuthContext';
 import axios from 'axios';
 import { BookOpen, Clock, Award, TrendingUp, LogOut, FileText } from 'lucide-react';
 import AcademicLogo from '../components/AcademicLogo';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const StudentDashboard = () => {
+  const { t } = useTranslation();
   const { user, token, logout } = useAuth();
   const navigate = useNavigate();
   const [exams, setExams] = useState([]);
@@ -33,7 +36,7 @@ const StudentDashboard = () => {
       'grade_2': 'Grade 2',
       'grade_3': 'Grade 3',
       'grade_4': 'Grade 4',
-      'grade_5': 'Grade 5'
+      'grade_5': t('common.grade5')
     };
     return gradeMap[grade] || grade;
   };
@@ -43,7 +46,7 @@ const StudentDashboard = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6]">
         <div className="text-center">
           <div className="spinner mb-4"></div>
-          <p className="text-xl font-bold text-[#92400E]">Loading your dashboard...</p>
+          <p className="text-xl font-bold text-[#92400E]">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -60,20 +63,22 @@ const StudentDashboard = () => {
                 <BookOpen className="w-7 h-7 text-white" strokeWidth={2.5} />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>Student Dashboard</h1>
-                <p className="text-sm md:text-base text-[#6B7280]">Welcome, <span className="font-semibold text-[#F59E0B]">{user.full_name}</span></p>
+                <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{t('dashboard.student')}</h1>
+                <p className="text-sm md:text-base text-[#6B7280]">{t('dashboard.welcome')}, <span className="font-semibold text-[#F59E0B]">{user.full_name}</span></p>
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <LanguageSwitcher />
               <div className="px-4 py-2 bg-[#F59E0B] text-white rounded-lg font-bold">
                 {getGradeDisplay(user.grade)}
               </div>
               <button
                 onClick={logout}
-                className="px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-1"
+                data-testid="logout-btn"
               >
-                <LogOut className="inline w-4 h-4 mr-1" />
-                <span className="hidden md:inline">Logout</span>
+                <LogOut className="w-4 h-4" />
+                <span className="hidden md:inline">{t('auth.logout')}</span>
               </button>
             </div>
           </div>
@@ -91,7 +96,7 @@ const StudentDashboard = () => {
               </div>
               <div>
                 <div className="text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{exams.length}</div>
-                <div className="text-sm font-medium text-[#6B7280]">Available Exams</div>
+                <div className="text-sm font-medium text-[#6B7280]">{t('exam.available')}</div>
               </div>
             </div>
           </div>
@@ -103,7 +108,7 @@ const StudentDashboard = () => {
               </div>
               <div>
                 <div className="text-3xl font-bold text-[#10B981]" style={{fontFamily: 'Manrope, sans-serif'}}>{attempts.length}</div>
-                <div className="text-sm font-medium text-[#6B7280]">Completed</div>
+                <div className="text-sm font-medium text-[#6B7280]">{t('exam.completed')}</div>
               </div>
             </div>
           </div>
@@ -115,7 +120,7 @@ const StudentDashboard = () => {
               </div>
               <div>
                 <div className="text-3xl font-bold text-[#3B82F6]" style={{fontFamily: 'Manrope, sans-serif'}}>-</div>
-                <div className="text-sm font-medium text-[#6B7280]">Avg Score</div>
+                <div className="text-sm font-medium text-[#6B7280]">{t('exam.avgScore')}</div>
               </div>
             </div>
           </div>
@@ -124,14 +129,14 @@ const StudentDashboard = () => {
         {/* Exams Section */}
         <div className="bg-white rounded-xl shadow-md p-6 md:p-8 border-2 border-[#E5E7EB]">
           <h2 className="text-2xl md:text-3xl font-bold mb-6 text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
-            Available Monthly Exams
+            {t('exam.availableExams')}
           </h2>
 
           {exams.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📚</div>
-              <p className="text-lg text-[#6B7280] font-semibold">No exams available yet</p>
-              <p className="text-sm text-[#9CA3AF] mt-2">Check back later or contact your teacher</p>
+              <p className="text-lg text-[#6B7280] font-semibold">{t('progress.noData')}</p>
+              <p className="text-sm text-[#9CA3AF] mt-2">{t('auth.needHelp')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -144,17 +149,17 @@ const StudentDashboard = () => {
                   <h3 className="text-xl font-bold mb-3 text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{exam.title}</h3>
                   
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#FCD34D] rounded-full mb-4">
-                    <span className="text-sm font-semibold text-[#92400E]">Month: {exam.month}</span>
+                    <span className="text-sm font-semibold text-[#92400E]">{t('exam.month')}: {exam.month}</span>
                   </div>
                   
                   <div className="flex gap-4 mb-4">
                     <div className="flex items-center gap-2 text-sm text-[#6B7280]">
                       <Clock className="w-4 h-4" />
-                      <span>{exam.duration_minutes} mins</span>
+                      <span>{exam.duration_minutes} {t('exam.minutes')}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-[#6B7280]">
                       <FileText className="w-4 h-4" />
-                      <span>{exam.paper1_questions?.length || 60} questions</span>
+                      <span>{exam.paper1_questions?.length || 60} {t('exam.questions')}</span>
                     </div>
                   </div>
 
@@ -164,7 +169,7 @@ const StudentDashboard = () => {
                     style={{fontFamily: 'Manrope, sans-serif'}}
                     data-testid={`start-exam-button-${exam.id}`}
                   >
-                    Start Exam →
+                    {t('exam.startExam')} →
                   </button>
                 </div>
               ))}

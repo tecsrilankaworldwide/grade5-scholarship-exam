@@ -1,270 +1,365 @@
 {
-  "brand_attributes": {
-    "name": "Grade 5 Scholarship Platform",
-    "personality": ["encouraging", "trustworthy", "cheerful", "calm focus", "official"],
-    "voice_tone": ["motivational", "clear", "age-appropriate"],
-    "audiences": ["students 7-11", "parents", "teachers/admins"]
-  },
-  "design_personality": {
-    "style_mix": [
-      "Bento Grid for dashboard cards",
-      "Swiss/functional layout for exam interface",
-      "Subtle Glassmorphism accents for results celebration only",
-      "Playful micro-animations (stars/streaks) with professional typography"
+  "meta": {
+    "product": "Grade 5 Scholarship Examination Platform (Sri Lanka)",
+    "audience": "Students ages 7–11, parents, teachers, administrators",
+    "goals": [
+      "Create playful yet official academic feel",
+      "Improve readability and focus during exams",
+      "Introduce subtle kid-friendly backgrounds and motifs",
+      "Add consistent ~3cm (80–100px) left padding across pages"
     ],
-    "layout_patterns": ["Z-Pattern for landing/login", "Single-Column focus for exam", "Card/Grid layout for dashboard", "Masonry for announcements if needed"],
-    "motion_principles": {
-      "duration_ms": {"fast": 120, "base": 200, "slow": 320},
-      "easing": "cubic-bezier(0.2, 0.8, 0.2, 1)",
-      "entrances": "fade+rise 12px, stagger children 60ms",
-      "hover": "lift 2-4px with shadow-md -> shadow-lg",
-      "press": "scale 0.98 with rebound",
-      "scroll": "parallax 6-10% only on hero/empty states, never on exam screen"
-    }
+    "brand_attributes": ["trustworthy", "motivating", "warm", "structured", "achievement-oriented"]
   },
+
   "color_system": {
-    "goal": "Keep warm orange/yellow family, increase kid-friendliness and contrast while retaining official look.",
-    "tokens_hex": {
-      "primary": "#F6A317",            
-      "primary-600": "#EB8F08",        
-      "primary-700": "#D97706",        
-      "secondary-brown": "#8A4D12",    
-      "secondary-brown-700": "#6E3B0E", 
-      "success": "#10B981",
-      "success-700": "#059669",
-      "warning": "#F59E0B",
-      "error": "#EF4444",
-      "info": "#0EA5E9",
+    "palette_hex": {
+      "primary": "#F59E0B",
+      "primary-dark": "#D97706",
+      "primary-soft": "#F6A317",
+      "surface": "#FFFBF0",
+      "surface-2": "#FFF7E5",
+      "surface-3": "#FFF1CC",
       "ink": "#1F2937",
       "ink-soft": "#374151",
-      "bg-0": "#FFFBF3",               
-      "bg-1": "#FFF7E6",
-      "bg-2": "#FFEFC7",
-      "accent-yellow": "#FCD34D",
-      "accent-peach": "#FFD89A",
-      "chart-orange": "#F6A317",
-      "chart-gold": "#F7AA37",
-      "chart-deep": "#EB7400",
-      "chart-green": "#0D7A6F"
+      "brown": "#92400E",
+      "brown-soft": "#78350F",
+      "success": "#16A34A",
+      "warning": "#F59E0B",
+      "error": "#DC2626",
+      "ring": "#F59E0B",
+      "chart-1": "#F6A317",
+      "chart-2": "#F59E0B",
+      "chart-3": "#D97706",
+      "chart-4": "#FCD34D",
+      "chart-5": "#92400E"
     },
-    "gradients": {
-      "hero_soft_diagonal": ["#FFF7E6", "#FFEFC7", "#FFFBF3"],
-      "cta_warm_glow": ["#FFFBF3", "#FFE8B5", "#FFD89A"],
-      "chart_fill": ["#F6A317", "#F7AA37", "#EB7400"],
-      "rules": [
-        "Do not exceed 20% viewport coverage with gradients",
-        "Never apply gradients to text-heavy reading areas",
-        "Use only light/pastel warm gradients; avoid saturated purple/pink/blue mixes",
-        "No gradients on small UI elements (<100px)"
+    "css_tokens": {
+      ":root": [
+        "--brand-primary: 35 92% 51%",        
+        "--brand-primary-dark: 35 92% 44%",
+        "--brand-surface: 48 100% 97%",
+        "--brand-surface-2: 45 100% 95%",
+        "--brand-surface-3: 45 100% 90%",
+        "--brand-ink: 215 28% 17%",
+        "--brand-ink-soft: 215 19% 27%",
+        "--brand-brown: 24 85% 32%",
+        "--brand-brown-soft: 26 86% 27%",
+        "--brand-ring: 35 92% 51%",
+        "--layout-left-gutter: 96px" 
       ]
     },
-    "index_css_root_overrides": "@layer base { :root { --background: 40 100% 99%; --foreground: 215 28% 17%; --card: 0 0% 100%; --card-foreground: 215 28% 17%; --popover: 0 0% 100%; --popover-foreground: 215 28% 17%; --primary: 38 94% 54%; --primary-foreground: 0 0% 100%; --secondary: 28 77% 30%; --secondary-foreground: 43 100% 97%; --muted: 45 100% 96%; --muted-foreground: 215 15% 40%; --accent: 46 94% 85%; --accent-foreground: 215 28% 17%; --destructive: 0 84% 60%; --destructive-foreground: 43 100% 97%; --border: 45 56% 90%; --input: 45 56% 90%; --ring: 38 94% 54%; --chart-1: 38 94% 54%; --chart-2: 43 93% 60%; --chart-3: 26 86% 46%; --chart-4: 164 79% 26%; --chart-5: 180 6% 20%; --radius: 0.75rem; } }",
     "usage": {
-      "text_on_primary": "Use white or near-white for WCAG AA",
-      "headings": "Prefer secondary-brown for a warm academic tone",
-      "exam_screen": "Use bg-0/bg-1 solids only; avoid gradients and animations behind content"
+      "backgrounds": [
+        "Use surface (#FFFBF0) as base app background",
+        "Use surface-2 and surface-3 for section splits",
+        "Keep primary (orange) for highlights, CTAs, charts, badges"
+      ],
+      "borders": "Use #F5E6B3 (hsl(45 70% 80%)) 1px for subtle separators",
+      "gradients": [
+        "Allowed only on section backgrounds or large hero bands; max 20% viewport",
+        "Examples: linear-gradient(180deg, #FFF7E5 0%, #FFF1CC 60%, #FFE7A3 100%)",
+        "Never apply gradients under dense text blocks or on small UI elements"
+      ]
     }
   },
+
   "typography": {
-    "headings": "Nunito (continue, bold/extra-bold)",
-    "ui_body": "Manrope for professional clarity",
-    "local_language_support": ["Noto Sans Sinhala", "Noto Sans Tamil"],
-    "google_fonts_import": "<link href=\"https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Nunito:wght@700;800;900&family=Noto+Sans+Sinhala:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&display=swap\" rel=\"stylesheet\">",
-    "classes": {
-      "h1": "font-extrabold text-4xl sm:text-5xl lg:text-6xl tracking-tight text-[color:var(--foreground)]",
-      "h2": "font-bold text-base md:text-lg text-[color:var(--foreground)]",
-      "body": "text-base sm:text-sm text-[color:var(--foreground)] leading-7",
-      "small": "text-sm text-[color:var(--muted-foreground)]"
-    }
-  },
-  "tokens": {
-    "spacing": {"xs": 4, "sm": 8, "md": 16, "lg": 24, "xl": 32, "xxl": 48},
-    "radius": {"sm": 8, "md": 12, "lg": 16, "xl": 24},
-    "shadows": {
-      "card": "0 6px 20px rgba(246, 163, 23, 0.12)",
-      "card-hover": "0 12px 32px rgba(246, 163, 23, 0.18)",
-      "focus": "0 0 0 3px rgba(246, 163, 23, 0.35)"
-    }
-  },
-  "buttons": {
-    "shape": "Playful / Youth primary with pill shape; Secondary uses professional medium radius",
-    "variants": {
-      "primary": "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] rounded-full px-5 py-3 font-semibold shadow-sm hover:shadow-md hover:bg-[#EB8F08] focus-visible:ring-2 focus-visible:ring-[#F6A317] focus-visible:outline-none",
-      "secondary": "bg-[hsl(var(--secondary))]/90 text-white rounded-md px-5 py-3 font-semibold hover:bg-[hsl(var(--secondary))] focus-visible:ring-2 focus-visible:ring-[#F6A317]",
-      "ghost": "bg-transparent text-[#8A4D12] rounded-full px-5 py-3 hover:bg-[#FFEFC7] border border-[hsl(var(--border))]"
+    "fonts": {
+      "heading": "Manrope",
+      "body": "Figtree",
+      "fallbacks": "system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
     },
-    "sizes": {"sm": "h-9 px-4 text-sm", "md": "h-11 px-6 text-base", "lg": "h-12 px-7 text-base"},
-    "data_testid_rule": "All Button components must forward data-testid like data-testid=\"primary-cta-button\""
-  },
-  "components": {
-    "component_path": {
-      "Button": "/app/frontend/src/components/ui/button.jsx",
-      "Card": "/app/frontend/src/components/ui/card.jsx",
-      "Input": "/app/frontend/src/components/ui/input.jsx",
-      "Label": "/app/frontend/src/components/ui/label.jsx",
-      "Progress": "/app/frontend/src/components/ui/progress.jsx",
-      "Tabs": "/app/frontend/src/components/ui/tabs.jsx",
-      "Switch": "/app/frontend/src/components/ui/switch.jsx",
-      "Badge": "/app/frontend/src/components/ui/badge.jsx",
-      "Dialog": "/app/frontend/src/components/ui/dialog.jsx",
-      "Tooltip": "/app/frontend/src/components/ui/tooltip.jsx",
-      "Toast(Sonner)": "/app/frontend/src/components/ui/sonner.jsx",
-      "RadioGroup": "/app/frontend/src/components/ui/radio-group.jsx",
-      "Calendar": "/app/frontend/src/components/ui/calendar.jsx",
-      "Table": "/app/frontend/src/components/ui/table.jsx"
+    "google_import": "<link href=\"https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Manrope:wght@700;800&display=swap\" rel=\"stylesheet\">",
+    "scale": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl leading-tight",
+      "h2": "text-base md:text-lg font-semibold",
+      "body": "text-sm md:text-base",
+      "small": "text-xs text-ink-soft"
     },
-    "icons": {
-      "library": "lucide-react",
-      "style": "simple stroke icons, 1.5px, colors from tokens",
-      "usage": "Do not use emoji. Example: <Star className=\"text-[#FCD34D]\" aria-hidden data-testid=\"reward-star-icon\" />"
-    },
-    "card_style": "rounded-xl border border-[hsl(var(--border))] bg-card shadow-[0_6px_20px_rgba(246,163,23,.08)]",
-    "card_hover": "hover:shadow-[0_12px_32px_rgba(246,163,23,.16)] hover:-translate-y-0.5 transition-shadow duration-200",
-    "input_style": "h-11 rounded-lg border-[hsl(var(--border))] focus-visible:ring-2 focus-visible:ring-[#F6A317] focus:outline-none placeholder:text-[hsl(var(--muted-foreground))]",
-    "chip_badge": "inline-flex items-center rounded-full bg-[#FFEFC7] text-[#8A4D12] px-3 py-1 text-xs font-semibold"
-  },
-  "page_layouts": {
-    "login": {
-      "goal": "Warm welcome for kids; quick sign-in; parent help link",
-      "structure": [
-        "Top: logo + brand in secondary-brown",
-        "Middle: card with Input (admission number or username), password, primary CTA",
-        "Side/Bottom: hero photo with soft diagonal gradient overlay (<=20% viewport)"
-      ],
-      "container_classes": "min-h-screen bg-[#FFFBF3] grid md:grid-cols-2 gap-8 p-6 md:p-10",
-      "card_classes": "max-w-md mx-auto md:mx-0 p-6 md:p-8 bg-white rounded-2xl shadow-lg",
-      "micro_interactions": ["staggered field fade-in", "button hover lift"],
-      "data_testids": ["login-username-input", "login-password-input", "login-form-submit-button", "login-help-link"]
-    },
-    "student_dashboard": {
-      "goal": "At-a-glance exams, streaks, rewards, and next action",
-      "structure": [
-        "Header: avatar + Welcome message + streak badge",
-        "Bento grid: 2-col on mobile -> 4-col on desktop of exam cards",
-        "Progress row: Recharts area/line",
-        "Rewards strip: badges with stars"
-      ],
-      "container_classes": "max-w-7xl mx-auto p-6 md:p-10 space-y-6",
-      "grid_classes": "grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6",
-      "card_types": {
-        "exam_card": "Card with subject color chip, attempt CTA, small progress bar",
-        "streak_card": "Glassmorphism accent only here: bg-white/70 backdrop-blur supports hero vibe"
-      },
-      "data_testids": ["exam-card-math", "exam-card-sinhala", "start-exam-button", "dashboard-progress-chart", "reward-badges-section"]
-    },
-    "exam_interface": {
-      "goal": "Calm, distraction-free 60 MCQ flow",
-      "rules": ["Solid backgrounds only (bg-0/bg-1)", "No parallax or decorative animations", "Large tap targets (min 44x44)", "Sticky top bar with timer and question progress"],
-      "topbar_classes": "sticky top-0 z-20 bg-[#FFFBF3] border-b border-[hsl(var(--border))]",
-      "question_card": "p-5 md:p-6 rounded-xl bg-white border border-[hsl(var(--border))] shadow-sm",
-      "option_item": "rounded-xl border-2 data-[state=checked]:border-[#10B981] data-[state=checked]:bg-[#ECFDF5] hover:border-[#F6A317] transition-colors",
-      "nav": "flex items-center justify-between pt-4",
-      "data_testids": ["exam-timer", "exam-question-text", "exam-option-a", "exam-option-b", "exam-option-c", "exam-option-d", "exam-next-button", "exam-prev-button", "exam-submit-button"]
-    },
-    "results_page": {
-      "goal": "Celebrate without overwhelming; clear breakdown for parents",
-      "structure": [
-        "Hero card with score, rank, and pass status",
-        "Confetti Lottie for short 2s on load (can be disabled in parent settings)",
-        "Breakdown tabs: by subject, strengths, improvements"
-      ],
-      "classes": "max-w-5xl mx-auto p-6 md:p-10 space-y-6",
-      "data_testids": ["result-total-score", "result-pass-badge", "result-subject-tabs", "result-download-button"]
-    },
-    "progress_reports": {
-      "goal": "Trend focused, parent-readable",
-      "components": ["Recharts Area/Bar/Line", "Table for attempts"],
-      "classes": "max-w-6xl mx-auto p-6 md:p-10 space-y-6",
-      "data_testids": ["progress-area-chart", "progress-bar-chart", "attempts-table"]
-    }
-  },
-  "micro_interactions": {
-    "buttons": "Hover: translate-y-[-2px] + shadow-lg. Active: translate-y-0. Use transition on background-color, box-shadow, transform only.",
-    "cards": "Hover: -translate-y-0.5 + shadow elevation. No hover motion on mobile.",
-    "charts": "Animate value entrances 300-600ms with ease-out",
-    "toasts": "Use Sonner with success color #10B981 and error #EF4444"
-  },
-  "accessibility": {
-    "contrast": "All text passes WCAG AA; verify orange on white with 4.5:1 for body text (use secondary-brown or ink for body)",
-    "focus": "Use 3px visible ring in primary (#F6A317)",
-    "touch_targets": ">=44px height for options and buttons",
-    "language_support": "Ensure Sinhala/Tamil rendering checks for numerals and punctuation"
-  },
-  "testing_attributes": {
-    "rule": "All interactive and key informational elements MUST include data-testid attributes (kebab-case, role based)",
-    "examples": [
-      "data-testid=\"login-form-submit-button\"",
-      "data-testid=\"exam-option-a\"",
-      "data-testid=\"result-total-score\""
+    "rules": [
+      "Headings use Manrope 800 with brown (#92400E)",
+      "Body uses Figtree 400–500 with ink (#1F2937)",
+      "Avoid all-caps for long headings; Title Case preferred",
+      "Line-height 1.5–1.6 for paragraphs"
     ]
   },
-  "code_scaffolds": {
-    "login_form_jsx": "import { Button } from './components/ui/button'; import { Input } from './components/ui/input'; import { Label } from './components/ui/label'; export default function LoginCard(){ return (<div className=\"max-w-md p-6 rounded-2xl bg-white shadow-lg\"> <form className=\"space-y-4\" data-testid=\"login-form\"> <div> <Label htmlFor=\"username\" className=\"text-[#8A4D12]\">Admission / Username</Label> <Input id=\"username\" data-testid=\"login-username-input\" placeholder=\"e.g., 5A-1023\" className=\"h-11 rounded-lg\" /> </div> <div> <Label htmlFor=\"password\" className=\"text-[#8A4D12]\">Password</Label> <Input id=\"password\" type=\"password\" data-testid=\"login-password-input\" className=\"h-11 rounded-lg\" /> </div> <Button data-testid=\"login-form-submit-button\" className=\"bg-[#F6A317] hover:bg-[#EB8F08] text-white rounded-full h-11 w-full\">Sign In</Button> <a href=\"#\" className=\"text-sm text-[#8A4D12] hover:underline\" data-testid=\"login-help-link\">Need help?</a> </form> </div> ); }",
-    "exam_question_jsx": "import { Card } from './components/ui/card'; import { RadioGroup, RadioGroupItem } from './components/ui/radio-group'; import { Button } from './components/ui/button'; export function Question({q, onNext, onPrev}){ return (<Card className=\"p-5 md:p-6\"> <div className=\"flex items-center justify-between pb-3 border-b\"> <div className=\"text-sm text-[#8A4D12]\" data-testid=\"exam-timer\">08:42</div> <div className=\"text-sm\">Q {q.index+1}/60</div> </div> <h2 className=\"mt-4 font-extrabold text-xl\" data-testid=\"exam-question-text\">{q.text}</h2> <RadioGroup className=\"mt-4 space-y-3\" data-testid=\"exam-options\"> {q.options.map((opt, i)=>{ const id = String.fromCharCode(65+i); return (<div key={id} className=\"flex items-center gap-3 p-4 rounded-xl border-2 hover:border-[#F6A317] data-[state=checked]:border-[#10B981] data-[state=checked]:bg-[#ECFDF5]\"> <RadioGroupItem value={id} id={id} data-testid={\`exam-option-${id.toLowerCase()}\`} /> <label htmlFor={id} className=\"font-semibold\">{id}. {opt}</label> </div> ); })} </RadioGroup> <div className=\"flex justify-between mt-4\"> <Button variant=\"ghost\" data-testid=\"exam-prev-button\">Previous</Button> <Button className=\"bg-[#F6A317] hover:bg-[#EB8F08]\" data-testid=\"exam-next-button\">Next</Button> </div> </Card> ); }",
-    "recharts_line_jsx": "import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line } from 'recharts'; export function ProgressChart({data}){ return (<div className=\"h-56\" data-testid=\"progress-area-chart\"> <ResponsiveContainer width=\"100%\" height=\"100%\"> <LineChart data={data}> <CartesianGrid stroke=\"#F6A31720\" /> <XAxis dataKey=\"label\" stroke=\"#8A4D12\" /> <YAxis stroke=\"#8A4D12\" /> <Tooltip /> <Line type=\"monotone\" dataKey=\"score\" stroke=\"#EB7400\" strokeWidth={3} dot={{ r: 3, stroke: '#F7AA37', fill: '#F7AA37' }} /> </LineChart> </ResponsiveContainer> </div> ); }"
+
+  "spacing_and_layout": {
+    "left_padding_requirement": {
+      "goal": "Introduce approximately 3cm (80–100px) left padding across all pages",
+      "mobile_first": "Start with mobile px-4; scale up on larger screens",
+      "tailwind_utilities": "container mx-auto px-4 sm:px-6 md:px-8 md:pl-20 lg:pl-24",
+      "css_token": "--layout-left-gutter: 96px",
+      "wrapper_example_jsx": "<main className=\"min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))] container mx-auto px-4 sm:px-6 md:px-8 md:pl-20 lg:pl-24\" data-testid=\"page-main\">...</main>",
+      "notes": [
+        "Do not center the entire app container with text-align: center",
+        "Ensure sticky sidebars respect the extra left padding"
+      ]
+    },
+    "grid": {
+      "dashboard": "grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6",
+      "dashboard_zones": [
+        "lg:col-span-8 for main content",
+        "lg:col-span-4 for secondary column/widgets"
+      ],
+      "exam_interface": "max-w-5xl mx-auto grid gap-4 md:gap-6"
+    }
   },
-  "images": {
-    "policy_note": "Use culturally sensitive, classroom-neutral photography. Do not identify people by name.",
-    "image_urls": [
+
+  "backgrounds_and_patterns": {
+    "principles": [
+      "Subtle, academic motifs (lined paper, dotted grid, stars, badges, books)",
+      "Opacity 4%–10% to avoid distraction",
+      "Place in section backgrounds, not inside cards/forms",
+      "Prefer cream surfaces; avoid saturated/dark gradients"
+    ],
+    "css_utilities_to_add": {
+      "index.css_additions": "@layer utilities {\n  .bg-lined-paper {\n    background-image: linear-gradient(to bottom, rgba(249, 202, 103, 0.18) 1px, transparent 1px);\n    background-size: 100% 28px;\n  }\n  .bg-dotted-grid {\n    background-image: radial-gradient(rgba(249, 202, 103, 0.20) 1px, transparent 1px);\n    background-size: 18px 18px;\n  }\n  .bg-stars-soft {\n    background-image: url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120' fill='none'><g fill='%23FCD34D' fill-opacity='0.18'><path d='M60 8l4 10 11 1-8 7 2 11-9-6-9 6 2-11-8-7 11-1 4-10z'/><circle cx='20' cy='20' r='2'/><circle cx='95' cy='40' r='2'/></g></svg>\");\n    background-size: 160px 160px;\n  }\n  .bg-badges-soft {\n    background-image: url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160' fill='none'><g stroke='%23F6A317' stroke-opacity='0.18' stroke-width='2'><circle cx='40' cy='40' r='14'/><path d='M36 28h8l2 8-6 4-6-4 2-8z'/></g></svg>\");\n    background-size: 200px 200px;\n  }\n  .noise-soft {\n    background-image: url('data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'220\\' height=\\'220\\'><filter id=\\'n\\'><feTurbulence type=\\'fractalNoise\\' baseFrequency=\\'0.65\\' numOctaves=\\'2\\' stitchTiles=\\'stitch\\'/></filter><rect width=\\'100%\\' height=\\'100%\\' filter=\\'url(%23n)\\' opacity=\\'0.03\\'/></svg>');\n  }\n}"
+    },
+    "page_backgrounds": {
+      "login": ["bg-dotted-grid noise-soft", "gradient: linear 180deg from #FFF7E5 to #FFE7A3 (<=20% viewport height)", "1–2 faint book icons via bg-badges-soft top-right"],
+      "student_dashboard": ["bg-lined-paper", "use badges or stars in header strip only"],
+      "teacher_admin_dashboard": ["solid surface (#FFFBF0) with subtle noise-soft", "no stars; keep academic tone"],
+      "exam_interface": ["solid surface (#FFFBF0) only; optional 2px top border with #FCD34D", "no repeating patterns inside test view"],
+      "results_and_certificates": ["bg-badges-soft on upper 30% header area only", "solid cream body for readability"]
+    }
+  },
+
+  "buttons": {
+    "style_family": "Professional / Corporate",
+    "tokens": {
+      "--btn-radius": "10px",
+      "--btn-shadow": "0 1px 2px rgba(146,64,14,0.10)",
+      "--btn-motion": "150ms ease-out"
+    },
+    "variants": {
+      "primary": "bg-[#F59E0B] hover:bg-[#D97706] text-white focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F59E0B]",
+      "secondary": "bg-[#FFF7E5] hover:bg-[#FFF1CC] text-[#92400E] border border-[#F5E6B3]",
+      "ghost": "bg-transparent hover:bg-[#FFF7E5] text-[#92400E]"
+    },
+    "sizes": {
+      "sm": "h-9 px-3",
+      "md": "h-10 px-4",
+      "lg": "h-11 px-5"
+    },
+    "transition_rule": "Do NOT use transition: all. Use transition-colors, transition-shadow only. Movement/scale if needed via Framer Motion, not CSS transforms."
+  },
+
+  "components": {
+    "use_shadcn": true,
+    "paths": {
+      "button": "/app/frontend/src/components/ui/button.jsx",
+      "card": "/app/frontend/src/components/ui/card.jsx",
+      "badge": "/app/frontend/src/components/ui/badge.jsx",
+      "tabs": "/app/frontend/src/components/ui/tabs.jsx",
+      "table": "/app/frontend/src/components/ui/table.jsx",
+      "progress": "/app/frontend/src/components/ui/progress.jsx",
+      "tooltip": "/app/frontend/src/components/ui/tooltip.jsx",
+      "dialog": "/app/frontend/src/components/ui/dialog.jsx",
+      "calendar": "/app/frontend/src/components/ui/calendar.jsx",
+      "select": "/app/frontend/src/components/ui/select.jsx",
+      "input": "/app/frontend/src/components/ui/input.jsx",
+      "textarea": "/app/frontend/src/components/ui/textarea.jsx",
+      "switch": "/app/frontend/src/components/ui/switch.jsx",
+      "sheet": "/app/frontend/src/components/ui/sheet.jsx",
+      "menubar": "/app/frontend/src/components/ui/menubar.jsx",
+      "navigation_menu": "/app/frontend/src/components/ui/navigation-menu.jsx",
+      "sonner": "/app/frontend/src/components/ui/sonner.jsx"
+    },
+    "reusables": [
       {
-        "url": "https://images.unsplash.com/photo-1698993082050-19ca94c62fb8?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "description": "Primary school student smiling in classroom, warm light",
-        "category": "login-hero"
+        "name": "StatCard",
+        "usage": "Student or admin KPIs",
+        "base": "Card",
+        "style": "bg-white/90 rounded-xl shadow-sm hover:shadow-md border border-[#F5E6B3]",
+        "micro": "hover:shadow-md via transition-shadow duration-150 (no transform)"
       },
       {
-        "url": "https://images.unsplash.com/photo-1698993081947-8a3654303904?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "description": "Group of students smiling at desks, warm light",
-        "category": "dashboard-welcome"
-      },
-      {
-        "url": "https://images.unsplash.com/flagged/photo-1574098335395-18cf525e45d6?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "description": "Focused child in classroom, shallow depth of field",
-        "category": "progress-report-hero"
+        "name": "ExamCTA",
+        "usage": "Start exam / Resume",
+        "base": "Button",
+        "style": "variant=primary size=lg w-full md:w-auto",
+        "testid": "cta-start-exam-button"
       }
     ]
   },
-  "library_integration": {
-    "install_steps": [
-      "npm i recharts framer-motion",
-      "npm i lucide-react",
-      "Ensure Sonner toast already exists at /app/frontend/src/components/ui/sonner.jsx"
+
+  "page_specific_guidance": {
+    "login": {
+      "layout": "split on lg: content left, illustration right. Mobile single column.",
+      "background": "bg-dotted-grid noise-soft with a 18–22% height warm gradient band behind the logo",
+      "card": "max-w-md mx-auto bg-white shadow-sm border border-[#F5E6B3] rounded-xl p-6 md:p-8",
+      "components": ["input", "button", "checkbox", "sonner"],
+      "testids": [
+        "login-form",
+        "login-email-input",
+        "login-password-input",
+        "login-submit-button",
+        "login-error-text"
+      ]
+    },
+    "student_dashboard": {
+      "layout": "container with md:pl-20 lg:pl-24; header strip with subtle stars, content on cream",
+      "widgets": [
+        "Progress ring or linear progress (use progress.jsx) for syllabus coverage",
+        "Upcoming exams (card list)",
+        "Badges (badge.jsx) for achievements"
+      ],
+      "charts": "Use Recharts with warm yellows/orange on white cards",
+      "testids": [
+        "student-dashboard-progress",
+        "student-dashboard-upcoming-exams",
+        "student-dashboard-badges"
+      ]
+    },
+    "teacher_admin_dashboard": {
+      "layout": "Two-column on lg with stat cards and recent activity table",
+      "tone": "avoid playful stars; keep lined-paper or noise only",
+      "testids": [
+        "admin-dashboard-stats",
+        "admin-dashboard-recent-activity-table",
+        "admin-dashboard-create-exam-button"
+      ]
+    },
+    "exam_interface": {
+      "focus_mode": true,
+      "background": "solid #FFFBF0 only. No patterns behind the question area.",
+      "header": "thin top bar: left shows paper title, center shows question x/total, right shows subtle timer",
+      "nav": "Previous, Next, Flag Question buttons only. Ghost style for Flag.",
+      "question_card": "bg-white border border-[#F5E6B3] rounded-xl p-5 md:p-6 shadow-sm",
+      "testids": [
+        "exam-timer",
+        "exam-progress-text",
+        "exam-question-card",
+        "exam-nav-prev-button",
+        "exam-nav-next-button",
+        "exam-flag-button",
+        "exam-submit-button"
+      ]
+    },
+    "results_and_certificates": {
+      "header_band": "bg-badges-soft over surface-2; include a medal/badge icon (lucide-react)",
+      "cards": "white paper-like cards with slight texture border",
+      "actions": "Download PDF, Share (admin) using primary/secondary buttons",
+      "testids": [
+        "results-summary-card",
+        "results-breakdown-table",
+        "certificate-download-button"
+      ]
+    }
+  },
+
+  "micro_interactions_and_motion": {
+    "rules": [
+      "No transition: all anywhere",
+      "Transitional properties limited to colors, shadows, opacity",
+      "Use Framer Motion for entrance and minor position transitions (not CSS transform transitions)",
+      "Keep animations under 200–250ms for focus contexts (exams)"
     ],
-    "usage_notes": [
-      "Use Shadcn components from /components/ui exclusively for dropdowns, dialogs, calendar, toasts",
-      "Avoid native HTML controls for complex components"
+    "examples": {
+      "framer_install": "npm i framer-motion",
+      "easing": "{ duration: 0.18, ease: 'easeOut' }",
+      "card_enter_jsx": "import { motion } from 'framer-motion';\n<motion.div initial={{opacity:0, y:8}} animate={{opacity:1, y:0}} transition={{duration:0.2, ease:'easeOut'}} data-testid=\"stat-card\">...</motion.div>",
+      "parallax_header_hint": "Apply subtle translateY via framer on scroll for header stars only on non-exam pages"
+    }
+  },
+
+  "charts_and_data_viz": {
+    "lib": "Recharts",
+    "install": "npm i recharts",
+    "palette": ["#F6A317", "#F59E0B", "#D97706", "#FCD34D", "#92400E"],
+    "rules": [
+      "Avoid heavy gradients; use flat fills",
+      "Axis labels in #374151, gridlines in rgba(146,64,14,0.12)",
+      "Minimum 12px labels for readability"
+    ],
+    "snippet": "import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';\n<ResponsiveContainer width=\"100%\" height={180} data-testid=\"student-progress-chart\">\n  <AreaChart data={data}>\n    <defs>\n      <linearGradient id=\"fillPrimary\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\">\n        <stop offset=\"0%\" stopColor=\"#F59E0B\" stopOpacity={0.35} />\n        <stop offset=\"100%\" stopColor=\"#F59E0B\" stopOpacity={0.06} />\n      </linearGradient>\n    </defs>\n    <XAxis dataKey=\"label\" stroke=\"#9CA3AF\" />\n    <YAxis stroke=\"#9CA3AF\" />\n    <Tooltip contentStyle={{ borderRadius: 10, borderColor: '#F5E6B3' }} />\n    <Area type=\"monotone\" dataKey=\"value\" stroke=\"#D97706\" fill=\"url(#fillPrimary)\" />\n  </AreaChart>\n</ResponsiveContainer>"
+  },
+
+  "accessibility_and_testing": {
+    "contrast": "Maintain WCAG AA: dark text on cream, white text on primary buttons",
+    "focus": "Use ring-[#F59E0B] with ring-offset-2; ensure keyboard navigation for exam controls",
+    "localization": "Prepare for Sinhala, Tamil, English labels; avoid text baked into images",
+    "readability": "Min 14px body on md+; 16px for inputs",
+    "testing_ids": {
+      "convention": "kebab-case describing role, stable across refactors",
+      "apply_to": ["buttons", "links", "inputs", "menus", "critical info texts"],
+      "examples": [
+        "login-form", "login-form-submit-button", "exam-question-card", "exam-progress-text", "admin-dashboard-create-exam-button"
+      ]
+    }
+  },
+
+  "code_scaffolds": {
+    "imports": {
+      "icons": "npm i lucide-react",
+      "usage": "import { Medal, Star, BookOpen } from 'lucide-react'"
+    },
+    "layout_wrapper_jsx": "export default function PageWrapper({ children }) {\n  return (\n    <div className=\"min-h-screen bg-[#FFFBF0] text-[#1F2937] container mx-auto px-4 sm:px-6 md:px-8 md:pl-20 lg:pl-24\" data-testid=\"page-wrapper\">\n      {children}\n    </div>\n  );\n}",
+    "exam_header_jsx": "<header className=\"sticky top-0 z-30 bg-[#FFFBF0] border-b border-[#F5E6B3]\" data-testid=\"exam-header\">\n  <div className=\"container mx-auto px-4 sm:px-6 md:px-8 md:pl-20 lg:pl-24 h-14 flex items-center justify-between\">\n    <div className=\"text-[#92400E] font-extrabold\" data-testid=\"paper-title\">Grade 5 Scholarship</div>\n    <div className=\"text-sm\" data-testid=\"exam-progress-text\">Q 5/50</div>\n    <div className=\"text-sm font-semibold text-[#92400E]\" data-testid=\"exam-timer\">59:12</div>\n  </div>\n</header>",
+    "button_usage_jsx": "import { Button } from './components/ui/button';\n<Button data-testid=\"exam-nav-next-button\" className=\"bg-[#F59E0B] hover:bg-[#D97706] text-white rounded-[10px] transition-colors\">Next</Button>",
+    "sonner_usage_jsx": "import { Toaster } from './components/ui/sonner';\n<Toaster position=\"top-right\" />"
+  },
+
+  "image_urls": [
+    {
+      "category": "login-hero-accent",
+      "description": "Yellow tiled geometric surface for subtle academic vibe",
+      "url": "https://images.unsplash.com/photo-1745878716659-dcf15b0dfe1f?crop=entropy&cs=srgb&fm=jpg&q=85"
+    },
+    {
+      "category": "dashboard-sidebar-motif",
+      "description": "Row of yellow lockers (crop to small sidebar banner)",
+      "url": "https://images.unsplash.com/photo-1723829096089-3e7576131e34?crop=entropy&cs=srgb&fm=jpg&q=85"
+    },
+    {
+      "category": "exam-hero-safety",
+      "description": "Sharpened #2 pencils on wood for pre-exam landing (use small accent only)",
+      "url": "https://images.unsplash.com/photo-1599081595468-de614fc93694?crop=entropy&cs=srgb&fm=jpg&q=85"
+    },
+    {
+      "category": "paper-texture-cards",
+      "description": "Warm cream subtle paper texture; apply softly to certificate header",
+      "url": "https://images.unsplash.com/photo-1693592401248-c9544518318a?crop=entropy&cs=srgb&fm=jpg&q=85"
+    }
+  ],
+
+  "web_inspiration": {
+    "search_notes": [
+      "Behance kids dashboards show warm tones, rounded cards, progress widgets",
+      "Minimalist exam UIs emphasize linear progress, subtle timers, essential controls only"
+    ],
+    "citations": [
+      "https://www.behance.net/search/projects/kids%20dashboard?locale=en_US",
+      "https://dribbble.com/search/kids-education-dashboard",
+      "https://www.nngroup.com/articles/characteristics-minimalism/"
     ]
   },
-  "grid_system": {
-    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
-    "columns": {"mobile": 4, "tablet": 8, "desktop": 12},
-    "gutters": {"mobile": 12, "tablet": 16, "desktop": 24}
+
+  "refactoring_notes": {
+    "app_css_compliance": [
+      "Replace button { transition: all 0.3s ease } with .btn { transition-property: background-color, color, box-shadow, border-color; transition-duration: 150ms; }",
+      "Remove transform-based hover from buttons/cards; use shadow/color changes instead or Framer Motion for movement"
+    ],
+    "containers": [
+      "Apply md:pl-20 lg:pl-24 to all major page containers to satisfy the 3cm left padding request"
+    ]
   },
-  "index_css_todos": [
-    "Add Google Fonts link in index.html head",
-    "Paste color_system.index_css_root_overrides into /app/frontend/src/index.css @layer base :root",
-    "Replace any 'transition: all' in CSS with property-specific transitions (e.g., transition: background-color 200ms, box-shadow 200ms, transform 120ms) per enforcement"
-  ],
-  "icons_and_illustrations": {
-    "icons": "lucide-react only",
-    "lottie": "Use a short 2s Confetti animation for results (search on lottiefiles.com); provide reduced-motion media query to disable",
-    "texture": "Optional ultra-subtle grain overlay: after:bg-[radial-gradient(closest-side,rgba(0,0,0,.03),transparent)] after:opacity-40 after:pointer-events-none"
-  },
+
   "instructions_to_main_agent": [
-    "Implement the new CSS variables under :root in index.css using the provided HSL values.",
-    "Refactor App.css button/card selectors to avoid transition: all; use property-specific transitions only.",
-    "Adopt shadcn/ui components listed in components.component_path. Do not introduce raw HTML dropdowns or toasts.",
-    "Add data-testid attributes to all interactive elements and key labels as per testing_attributes.rule.",
-    "Apply gradient backgrounds only to login hero or empty-state banners; never on exam interface.",
-    "Use secondary-brown for headings and icons where orange on white may fail AA.",
-    "Keep spacing generous: use mt-6/mb-6 and gap-6 on desktop, gap-4 on mobile.",
-    "Charts: prefer Recharts; use the provided ProgressChart scaffold and palette.",
-    "For calendars (scheduling exams), use /components/ui/calendar.jsx only.",
-    "Check focus-visible rings and keyboard navigation across all key pages."
+    "Add Google Fonts import for Manrope and Figtree in public/index.html head",
+    "Append utilities from backgrounds_and_patterns.css_utilities_to_add into src/index.css under @layer utilities",
+    "Wrap all pages with container mx-auto px-4 sm:px-6 md:px-8 md:pl-20 lg:pl-24",
+    "Use shadcn/ui components from the specified .jsx paths only",
+    "All interactive/critical elements must have a data-testid attribute (kebab-case role names)",
+    "Keep gradients light and in section bands only; never exceed 20% viewport; fall back to solid colors otherwise",
+    "Use Recharts for dashboard stats; Sonner for toasts; Framer Motion for entrances (no CSS transform transitions)",
+    "On exam pages, disable decorative backgrounds; show solid cream with slim border and clear hierarchy"
   ]
 }
 
 
-General UI UX Design Guidelines  
+<General UI UX Design Guidelines>  
     - You must **not** apply universal transition. Eg: `transition: all`. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms
     - You must **not** center align the app container, ie do not add `.App { text-align: center; }` in the css file. This disrupts the human natural reading flow of text
    - NEVER: use AI assistant Emoji characters like`🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons. Always use **FontAwesome cdn** or **lucid-react** library already installed in the package.json
@@ -320,4 +415,5 @@ NEVER stack multiple gradient layers in the same viewport.
   - Use `sonner` for toasts"
   - Sonner component are located in `/app/src/components/ui/sonner.tsx`
 
-Use 2–4 color gradients, subtle textures/noise overlays, or CSS-based noise to avoid flat visuals."}]},
+Use 2–4 color gradients, subtle textures/noise overlays, or CSS-based noise to avoid flat visuals.
+</General UI UX Design Guidelines>

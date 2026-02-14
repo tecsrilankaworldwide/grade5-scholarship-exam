@@ -8,7 +8,7 @@ import sys
 from datetime import datetime
 
 # Use public endpoint
-BASE_URL = "https://hello-e2.preview.emergentagent.com/api"
+BASE_URL = "https://grade5-scholar.preview.emergentagent.com/api"
 
 class ExamPlatformTester:
     def __init__(self):

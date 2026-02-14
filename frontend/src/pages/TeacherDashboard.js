@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth, API } from '../AuthContext';
 import axios from 'axios';
 import { PlusCircle, FileText, Users, LogOut, Edit, CheckCircle, BookOpen } from 'lucide-react';
 import ExamCreator from '../components/ExamCreator';
 import Paper2Marking from '../components/Paper2Marking';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const TeacherDashboard = () => {
+  const { t } = useTranslation();
   const { user, token, logout } = useAuth();
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,18 +66,19 @@ const TeacherDashboard = () => {
                 <BookOpen className="w-7 h-7 text-white" strokeWidth={2.5} />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>Teacher Dashboard</h1>
-                <p className="text-sm md:text-base text-[#6B7280]">Welcome, <span className="font-semibold text-[#F59E0B]">{user.full_name}</span></p>
+                <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{t('dashboard.teacher')}</h1>
+                <p className="text-sm md:text-base text-[#6B7280]">{t('dashboard.welcome')}, <span className="font-semibold text-[#F59E0B]">{user.full_name}</span></p>
               </div>
             </div>
             <div className="flex gap-2 md:gap-3">
+              <LanguageSwitcher />
               <button
                 onClick={() => setShowPaper2Marking(true)}
                 className="px-3 md:px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base"
                 data-testid="paper2-marking-button"
               >
                 <BookOpen className="inline w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Paper 2</span>
+                <span className="hidden sm:inline">{t('teacher.paper2')}</span>
               </button>
               <button
                 onClick={() => setShowCreateExam(true)}
@@ -82,14 +86,15 @@ const TeacherDashboard = () => {
                 data-testid="create-exam-button"
               >
                 <PlusCircle className="inline w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Create</span>
+                <span className="hidden sm:inline">{t('teacher.createExam')}</span>
               </button>
               <button
                 onClick={logout}
                 className="px-3 md:px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                data-testid="logout-btn"
               >
                 <LogOut className="inline w-4 h-4 mr-1" />
-                <span className="hidden md:inline">Logout</span>
+                <span className="hidden md:inline">{t('auth.logout')}</span>
               </button>
             </div>
           </div>
@@ -107,7 +112,7 @@ const TeacherDashboard = () => {
               </div>
               <div>
                 <div className="text-2xl md:text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{exams.length}</div>
-                <div className="text-xs md:text-sm font-medium text-[#6B7280]">Total Exams</div>
+                <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('teacher.totalExams')}</div>
               </div>
             </div>
           </div>
@@ -119,7 +124,7 @@ const TeacherDashboard = () => {
               </div>
               <div>
                 <div className="text-2xl md:text-3xl font-bold text-[#10B981]" style={{fontFamily: 'Manrope, sans-serif'}}>{publishedExams}</div>
-                <div className="text-xs md:text-sm font-medium text-[#6B7280]">Published</div>
+                <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('teacher.published')}</div>
               </div>
             </div>
           </div>
@@ -131,7 +136,7 @@ const TeacherDashboard = () => {
               </div>
               <div>
                 <div className="text-2xl md:text-3xl font-bold text-[#D97706]" style={{fontFamily: 'Manrope, sans-serif'}}>{draftExams}</div>
-                <div className="text-xs md:text-sm font-medium text-[#6B7280]">Drafts</div>
+                <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('teacher.drafts')}</div>
               </div>
             </div>
           </div>
@@ -143,7 +148,7 @@ const TeacherDashboard = () => {
               </div>
               <div>
                 <div className="text-2xl md:text-3xl font-bold text-[#3B82F6]" style={{fontFamily: 'Manrope, sans-serif'}}>-</div>
-                <div className="text-xs md:text-sm font-medium text-[#6B7280]">Students</div>
+                <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('teacher.students')}</div>
               </div>
             </div>
           </div>
@@ -152,18 +157,18 @@ const TeacherDashboard = () => {
         {/* Exams List */}
         <div className="bg-white rounded-xl shadow-md p-6 md:p-8 border-2 border-[#E5E7EB]">
           <h2 className="text-xl md:text-2xl font-bold mb-6 text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
-            Exam Management
+            {t('teacher.examManagement')}
           </h2>
 
           {exams.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📝</div>
-              <p className="text-lg text-[#6B7280] font-semibold">No exams created yet</p>
+              <p className="text-lg text-[#6B7280] font-semibold">{t('progress.noData')}</p>
               <button
                 onClick={() => setShowCreateExam(true)}
                 className="mt-4 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"
               >
-                Create Your First Exam
+                {t('teacher.createExam')}
               </button>
             </div>
           ) : (
@@ -178,19 +183,19 @@ const TeacherDashboard = () => {
                     <div className="flex-1">
                       <h3 className="text-lg md:text-xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{exam.title}</h3>
                       <p className="text-sm text-[#6B7280] mt-1">
-                        Grade: {exam.grade.replace('_', ' ').toUpperCase()} | Month: {exam.month}
+                        Grade: {exam.grade.replace('_', ' ').toUpperCase()} | {t('exam.month')}: {exam.month}
                       </p>
                       <p className="text-sm text-[#6B7280]">
-                        Questions: {exam.paper1_questions?.length || 0} / 60
+                        {t('exam.questions')}: {exam.paper1_questions?.length || 0} / 60
                       </p>
                       <div className="mt-2">
                         {exam.status === 'published' ? (
                           <span className="px-3 py-1 bg-green-100 text-green-700 font-semibold rounded-full text-xs">
-                            ✓ Published
+                            ✓ {t('teacher.published')}
                           </span>
                         ) : (
                           <span className="px-3 py-1 bg-orange-100 text-orange-700 font-semibold rounded-full text-xs">
-                            ✎ Draft
+                            ✎ {t('teacher.drafts')}
                           </span>
                         )}
                       </div>
@@ -208,7 +213,7 @@ const TeacherDashboard = () => {
                       )}
                       <button className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 text-sm">
                         <Edit className="inline w-4 h-4 mr-1" />
-                        View
+                        {t('common.view')}
                       </button>
                     </div>
                   </div>

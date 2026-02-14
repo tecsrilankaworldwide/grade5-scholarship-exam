@@ -93,7 +93,7 @@ const AcademicLogo = ({ size = 'large' }) => {
             letterSpacing: '0.05em'
           }}
         >
-          Educational Reforms Bureau
+          Education Reforms
         </h1>
         
         {/* Divider line */}

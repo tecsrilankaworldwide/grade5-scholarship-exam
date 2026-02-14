@@ -15,11 +15,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ExamInterface from './pages/ExamInterface';
 import ProgressReport from './pages/ProgressReport';
 
-<<<<<<< HEAD
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
-=======
-const API = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8002'}/api`;
->>>>>>> 4ee35018177a3705523316c49228955afe58e27f
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {

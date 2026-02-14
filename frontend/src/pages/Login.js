@@ -52,14 +52,14 @@ const Login = () => {
           </div>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border-3 border-red-300 rounded-xl text-red-700">
+            <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-xl text-red-700 text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-[#374151] mb-2" style={{fontFamily: 'Figtree, sans-serif'}}>
                 <Mail className="inline w-4 h-4 mr-1" />
                 Parent/Guardian Email
               </label>
@@ -68,17 +68,17 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 border-3 rounded-xl focus:outline-none"
-                style={{borderColor: '#FFD89A', fontSize: '16px'}}
+                className="w-full px-4 py-3 border-2 border-[#F5E6B3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B] transition-all"
+                style={{fontSize: '16px'}}
                 placeholder="parent@email.com"
               />
-              <p className="text-xs mt-1" style={{color: '#8A4D12'}}>
+              <p className="text-xs mt-1 text-[#92400E]">
                 Students should use their parent's email
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-[#374151] mb-2" style={{fontFamily: 'Figtree, sans-serif'}}>
                 <Lock className="inline w-4 h-4 mr-1" />
                 Password
               </label>
@@ -87,8 +87,8 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 border-3 rounded-xl focus:outline-none"
-                style={{borderColor: '#FFD89A', fontSize: '16px'}}
+                className="w-full px-4 py-3 border-2 border-[#F5E6B3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B] transition-all"
+                style={{fontSize: '16px'}}
                 placeholder="Enter password"
               />
             </div>
@@ -96,10 +96,10 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50"
-              style={{background: 'linear-gradient(135deg, #F6A317, #EB8F08)', fontSize: '18px', fontFamily: 'Nunito, sans-serif'}}
+              className="w-full py-3 md:py-4 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:from-[#D97706] hover:to-[#B45309]"
+              style={{fontSize: '16px', fontFamily: 'Manrope, sans-serif'}}
             >
-              {loading ? 'Signing In...' : 'Sign In →'}
+              {loading ? 'Signing In...' : 'Sign In \u2192'}
             </button>
           </form>
 

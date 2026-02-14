@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth, API } from '../AuthContext';
 import axios from 'axios';
 import { Shield, Users, FileText, LogOut, Plus, Edit, Trash2, Search } from 'lucide-react';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const AdminDashboard = () => {
+  const { t } = useTranslation();
   const { user, token, logout } = useAuth();
   const [stats, setStats] = useState({
     students: 0,
@@ -100,25 +103,27 @@ const AdminDashboard = () => {
                 <Shield className="w-7 h-7 text-white" strokeWidth={2.5} />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>Admin Dashboard</h1>
-                <p className="text-sm md:text-base text-[#6B7280]">Welcome, <span className="font-semibold text-[#F59E0B]">{user.full_name}</span></p>
+                <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{t('dashboard.admin')}</h1>
+                <p className="text-sm md:text-base text-[#6B7280]">{t('dashboard.welcome')}, <span className="font-semibold text-[#F59E0B]">{user.full_name}</span></p>
               </div>
             </div>
             <div className="flex gap-3">
+              <LanguageSwitcher />
               <button
                 onClick={() => setShowAddUser(true)}
                 className="px-3 md:px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base"
                 data-testid="add-user-button"
               >
                 <Plus className="inline w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Add User</span>
+                <span className="hidden sm:inline">{t('admin.addUser')}</span>
               </button>
               <button
                 onClick={logout}
                 className="px-3 md:px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                data-testid="logout-btn"
               >
                 <LogOut className="inline w-4 h-4 mr-1" />
-                <span className="hidden md:inline">Logout</span>
+                <span className="hidden md:inline">{t('auth.logout')}</span>
               </button>
             </div>
           </div>
@@ -133,7 +138,7 @@ const AdminDashboard = () => {
               <Users className="w-5 h-5 md:w-6 md:h-6 text-[#3B82F6]" />
             </div>
             <div className="text-2xl md:text-3xl font-bold mb-1 text-[#3B82F6]" style={{fontFamily: 'Manrope, sans-serif'}}>{stats.students}</div>
-            <div className="text-xs md:text-sm font-medium text-[#6B7280]">Students</div>
+            <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('teacher.students')}</div>
           </div>
 
           <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border-2 border-[#E5E7EB]">
@@ -141,7 +146,7 @@ const AdminDashboard = () => {
               <FileText className="w-5 h-5 md:w-6 md:h-6 text-[#10B981]" />
             </div>
             <div className="text-2xl md:text-3xl font-bold mb-1 text-[#10B981]" style={{fontFamily: 'Manrope, sans-serif'}}>{stats.exams}</div>
-            <div className="text-xs md:text-sm font-medium text-[#6B7280]">Exams</div>
+            <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('exam.available')}</div>
           </div>
 
           <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border-2 border-[#E5E7EB]">
@@ -149,7 +154,7 @@ const AdminDashboard = () => {
               <Shield className="w-5 h-5 md:w-6 md:h-6 text-[#F59E0B]" />
             </div>
             <div className="text-2xl md:text-3xl font-bold mb-1 text-[#F59E0B]" style={{fontFamily: 'Manrope, sans-serif'}}>{stats.teachers}</div>
-            <div className="text-xs md:text-sm font-medium text-[#6B7280]">Teachers</div>
+            <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('admin.teachers')}</div>
           </div>
 
           <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border-2 border-[#E5E7EB]">
@@ -157,7 +162,7 @@ const AdminDashboard = () => {
               <Users className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
             </div>
             <div className="text-2xl md:text-3xl font-bold mb-1 text-purple-600" style={{fontFamily: 'Manrope, sans-serif'}}>{stats.parents}</div>
-            <div className="text-xs md:text-sm font-medium text-[#6B7280]">Parents</div>
+            <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('admin.parents')}</div>
           </div>
         </div>
 
@@ -165,13 +170,13 @@ const AdminDashboard = () => {
         <div className="bg-white rounded-xl shadow-md p-6 md:p-8 border-2 border-[#E5E7EB]">
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
             <h2 className="text-xl md:text-2xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
-              User Management
+              {t('admin.userManagement')}
             </h2>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search users..."
+                placeholder={`${t('common.search')}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 border-2 border-[#E5E7EB] rounded-lg w-full md:w-64"
@@ -192,28 +197,28 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map(user => (
-                  <tr key={user.id} className="border-b border-[#E5E7EB] hover:bg-[#FFF7E5]" data-testid={`user-row-${user.id}`}>
-                    <td className="py-3 px-4 font-semibold">{user.full_name}</td>
-                    <td className="py-3 px-4 text-[#6B7280]">{user.email}</td>
+                {filteredUsers.map(u => (
+                  <tr key={u.id} className="border-b border-[#E5E7EB] hover:bg-[#FFF7E5]" data-testid={`user-row-${u.id}`}>
+                    <td className="py-3 px-4 font-semibold">{u.full_name}</td>
+                    <td className="py-3 px-4 text-[#6B7280]">{u.email}</td>
                     <td className="py-3 px-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                        user.role === 'teacher' ? 'bg-blue-100 text-blue-700' :
-                        user.role === 'student' ? 'bg-green-100 text-green-700' :
+                        u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
+                        u.role === 'teacher' ? 'bg-blue-100 text-blue-700' :
+                        u.role === 'student' ? 'bg-green-100 text-green-700' :
                         'bg-orange-100 text-orange-700'
                       }`}>
-                        {user.role.toUpperCase()}
+                        {u.role.toUpperCase()}
                       </span>
                     </td>
                     <td className="py-3 px-4">
-                      {user.is_active ? (
+                      {u.is_active ? (
                         <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-                          ✓ Active
+                          ✓ {t('admin.active')}
                         </span>
                       ) : (
                         <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">
-                          ✕ Inactive
+                          ✕ {t('admin.inactive')}
                         </span>
                       )}
                     </td>
@@ -240,7 +245,7 @@ const AdminDashboard = () => {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6">
           <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#E5E7EB] p-8 max-w-md w-full">
             <h3 className="text-2xl font-bold mb-6 text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
-              Add New User
+              {t('admin.addUser')}
             </h3>
 
             <div className="space-y-4">
@@ -269,13 +274,13 @@ const AdminDashboard = () => {
               </div>
 
               <div>
-                <label className="block font-semibold mb-2 text-[#374151]">Password *</label>
+                <label className="block font-semibold mb-2 text-[#374151]">{t('auth.password')} *</label>
                 <input
                   type="password"
                   value={newUser.password}
                   onChange={(e) => setNewUser({...newUser, password: e.target.value})}
                   className="w-full px-4 py-3 border-2 border-[#E5E7EB] rounded-lg"
-                  placeholder="Enter password"
+                  placeholder={t('auth.passwordPlaceholder')}
                   data-testid="new-user-password-input"
                 />
               </div>
@@ -304,28 +309,25 @@ const AdminDashboard = () => {
                     className="w-full px-4 py-3 border-2 border-[#E5E7EB] rounded-lg"
                     data-testid="new-user-grade-select"
                   >
-                    <option value="grade_2">Grade 2</option>
-                    <option value="grade_3">Grade 3</option>
-                    <option value="grade_4">Grade 4</option>
-                    <option value="grade_5">Grade 5</option>
+                    <option value="grade_5">{t('common.grade5')}</option>
                   </select>
                 </div>
               )}
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex gap-3 mt-8">
               <button
                 onClick={() => setShowAddUser(false)}
                 className="flex-1 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleAddUser}
                 className="flex-1 py-3 bg-[#F59E0B] text-white font-semibold rounded-lg hover:bg-[#D97706]"
-                data-testid="save-new-user-button"
+                data-testid="confirm-add-user-button"
               >
-                Add User
+                {t('admin.addUser')}
               </button>
             </div>
           </div>

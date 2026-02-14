@@ -1,5 +1,4 @@
 import React from 'react';
-import { BookOpen, Award } from 'lucide-react';
 
 const AcademicLogo = ({ size = 'large' }) => {
   const dimensions = {
@@ -40,7 +39,7 @@ const AcademicLogo = ({ size = 'large' }) => {
           squares.push(
             <div
               key={`${row}-${col}`}
-              className=\"rounded-sm\"
+              className="rounded-sm"
               style={{
                 width: `${squareSize}px`,
                 height: `${squareSize}px`,
@@ -66,22 +65,21 @@ const AcademicLogo = ({ size = 'large' }) => {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Academic Badge/Seal Logo */}
+      {/* Digital Square Badge Logo */}
       <div className="mb-6">
         <div 
-          className="relative bg-white rounded-full flex items-center justify-center border-8 shadow-xl"
+          className="bg-white p-4 rounded-2xl shadow-xl border-4"
           style={{
-            width: `${logoSize}px`,
-            height: `${logoSize}px`,
             borderColor: '#F59E0B'
           }}
         >
-          {/* Inner circle */}
-          <div className="absolute inset-3 rounded-full border-4 border-[#92400E]"></div>
-          
-          {/* Center icon */}
-          <div className="relative z-10">
-            <BookOpen className="w-12 h-12 md:w-16 md:h-16 text-[#F59E0B]" strokeWidth={2.5} />
+          <div 
+            className="grid gap-1"
+            style={{
+              gridTemplateColumns: `repeat(${gridSize}, ${squareSize}px)`,
+            }}
+          >
+            {generateSquarePattern()}
           </div>
         </div>
       </div>

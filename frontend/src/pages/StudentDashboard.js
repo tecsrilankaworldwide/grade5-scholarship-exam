@@ -133,7 +133,11 @@ const StudentDashboard = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {exams.map(exam => (
-                <div key={exam.id} className="bg-gradient-to-br from-yellow-50 to-white rounded-2xl p-6 border-3 border-yellow-200 shadow-md hover:shadow-xl transition-all hover:scale-105">
+                <div 
+                  key={exam.id} 
+                  className="bg-gradient-to-br from-yellow-50 to-white rounded-2xl p-6 border-3 border-yellow-200 shadow-md hover:shadow-xl transition-all hover:scale-105"
+                  data-testid={`exam-card-${exam.id}`}
+                >
                   <h3 className="text-xl font-extrabold mb-2" style={{color: '#92400E'}}>{exam.title}</h3>
                   <p className="text-sm text-gray-600 mb-4">Month: {exam.month}</p>
                   
@@ -151,6 +155,7 @@ const StudentDashboard = () => {
                   <button
                     onClick={() => navigate(`/exam/${exam.id}`)}
                     className="w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg"
+                    data-testid={`start-exam-button-${exam.id}`}
                   >
                     Start Exam →
                   </button>

@@ -49,7 +49,7 @@ const StudentDashboard = () => {
     <div className="min-h-screen bg-[#FFFBF0] bg-lined-paper">
       {/* Header with stars background */}
       <div className="bg-gradient-to-r from-[#FFF7E5] via-[#FFF1CC] to-[#FFF7E5] bg-stars-soft shadow-md border-b-4 border-[#F59E0B]">
-        <div className="container mx-auto px-4 sm:px-6 md:px-8 md:pl-20 lg:pl-24 py-4">
+        <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-[#F59E0B] rounded-full flex items-center justify-center">
@@ -77,7 +77,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 sm:px-6 md:px-8 md:pl-20 lg:pl-24 py-6 md:py-8">
+      <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 py-6 md:py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
           <div className="bg-white/95 rounded-2xl p-5 md:p-6 shadow-lg border border-[#F5E6B3] hover:shadow-xl transition-shadow">

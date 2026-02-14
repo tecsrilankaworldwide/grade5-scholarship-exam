@@ -30,7 +30,7 @@ code {
         --brand-brown: 24 85% 32%;
         --brand-brown-soft: 26 86% 27%;
         --brand-ring: 35 92% 51%;
-        --layout-left-gutter: 96px;
+        --layout-left-gutter: 240px;
         
         /* Shadcn defaults */
         --background: 48 100% 97%;

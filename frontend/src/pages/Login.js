@@ -31,7 +31,7 @@ const Login = () => {
       {/* Decorative gradient band */}
       <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#FFF7E5] via-[#FFF1CC] to-transparent opacity-60"></div>
       
-      <div className="max-w-md w-full px-4 sm:px-6 md:px-8 md:pl-20 relative z-10">
+      <div className="max-w-md w-full px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-3xl shadow-lg flex items-center justify-center mx-auto mb-4 border-4 border-[#F59E0B]">

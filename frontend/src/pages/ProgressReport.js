@@ -254,7 +254,7 @@ const ProgressReport = () => {
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-[#6B7280]">
-          <p>© 2026 Education Reforms. All rights reserved.</p>
+          <p>© 2026 educationreforms.cloud | All rights reserved.</p>
         </div>
       </div>
     </div>

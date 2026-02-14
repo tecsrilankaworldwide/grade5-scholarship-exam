@@ -123,7 +123,7 @@ const Login = () => {
           
           {/* Footer note */}
           <div className="text-center mt-6">
-            <p className="text-sm text-[#6B7280]">© 2026 Education Reforms. All rights reserved.</p>
+            <p className="text-sm text-[#6B7280]">© 2026 educationreforms.cloud | All rights reserved.</p>
           </div>
         </div>
       </div>

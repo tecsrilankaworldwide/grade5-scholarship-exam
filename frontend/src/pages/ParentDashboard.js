@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, API } from '../AuthContext';
 import axios from 'axios';
-import { Users, TrendingUp, Award, LogOut, BarChart3, Link2, Plus } from 'lucide-react';
+import { Users, TrendingUp, Award, LogOut, BarChart3, Link2, BookOpen } from 'lucide-react';
 
 const ParentDashboard = () => {
   const { user, token, logout } = useAuth();
@@ -19,14 +19,11 @@ const ParentDashboard = () => {
 
   const loadChildren = async () => {
     try {
-      // Mock data for students linked to this parent
-      // In production, fetch students where parent_id matches current user
       const mockChildren = [
         { id: 'student_123', name: 'Sample Student', grade: 'grade_5', email: 'student@test.com' }
       ];
       setChildren(mockChildren);
       
-      // Mock all students for linking
       const mockAllStudents = [
         { id: 'student_123', name: 'Sample Student', grade: 'grade_5', email: 'student@test.com' },
         { id: 'student_456', name: 'Another Student', grade: 'grade_4', email: 'student2@test.com' }
@@ -47,12 +44,6 @@ const ParentDashboard = () => {
     }
 
     try {
-      // In production, call backend API to link student to parent
-      // await axios.put(`${API}/users/link-student`, 
-      //   { student_id: selectedStudent, parent_id: user.id },
-      //   { headers: { Authorization: `Bearer ${token}` } }
-      // );
-      
       alert('Student linked successfully!');
       setShowLinkStudent(false);
       setSelectedStudent('');
@@ -68,39 +59,42 @@ const ParentDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{background: '#FFFBF0'}}>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6]">
         <div className="spinner"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{background: 'linear-gradient(135deg, #FFF9E6, #FFFACD)'}}>
+    <div className="min-h-screen bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6]">
       {/* Header */}
-      <div className="bg-white shadow-md border-b-4" style={{borderColor: '#F59E0B'}}>
-        <div className="max-w-6xl mx-auto px-6 py-4">
+      <div className="bg-white shadow-md border-b-4 border-[#F59E0B]">
+        <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 py-5">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-extrabold" style={{color: '#92400E', fontFamily: 'Nunito'}}>
-                <Users className="inline w-8 h-8 mr-2" />
-                Parent Portal
-              </h1>
-              <p className="text-gray-600">Welcome, {user.full_name}!</p>
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-[#F59E0B] rounded-lg flex items-center justify-center">
+                <Users className="w-7 h-7 text-white" strokeWidth={2.5} />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>Parent Portal</h1>
+                <p className="text-sm md:text-base text-[#6B7280]">Welcome, <span className="font-semibold text-[#F59E0B]">{user.full_name}</span></p>
+              </div>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowLinkStudent(true)}
-                className="px-5 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
+                className="px-3 md:px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base"
                 data-testid="link-student-button"
               >
-                <Link2 className="inline w-5 h-5 mr-2" />
-                Link Student
+                <Link2 className="inline w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">Link</span>
               </button>
               <button
                 onClick={logout}
-                className="px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200"
+                className="px-3 md:px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
               >
-                <LogOut className="inline w-4 h-4 mr-1" />Logout
+                <LogOut className="inline w-4 h-4 mr-1" />
+                <span className="hidden md:inline">Logout</span>
               </button>
             </div>
           </div>
@@ -108,61 +102,60 @@ const ParentDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto p-6">
+      <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 py-8">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-lg border-3" style={{borderColor: '#3B82F6'}}>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
+          <div className="bg-white rounded-xl p-6 shadow-md border-2 border-[#E5E7EB]">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#EFF6FF] rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-[#3B82F6]" />
               </div>
               <div>
-                <div className="text-3xl font-extrabold" style={{color: '#2563EB'}}>{children.length}</div>
-                <div className="text-sm font-semibold text-gray-600">Linked Children</div>
+                <div className="text-3xl font-bold text-[#3B82F6]" style={{fontFamily: 'Manrope, sans-serif'}}>{children.length}</div>
+                <div className="text-sm font-medium text-[#6B7280]">Linked Children</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-lg border-3" style={{borderColor: '#10B981'}}>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-green-600" />
+          <div className="bg-white rounded-xl p-6 shadow-md border-2 border-[#E5E7EB]">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#ECFDF5] rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-[#10B981]" />
               </div>
               <div>
-                <div className="text-3xl font-extrabold" style={{color: '#059669'}}>-</div>
-                <div className="text-sm font-semibold text-gray-600">Avg Progress</div>
+                <div className="text-3xl font-bold text-[#10B981]" style={{fontFamily: 'Manrope, sans-serif'}}>-</div>
+                <div className="text-sm font-medium text-[#6B7280]">Avg Progress</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-lg border-3" style={{borderColor: '#F59E0B'}}>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                <Award className="w-6 h-6 text-yellow-600" />
+          <div className="bg-white rounded-xl p-6 shadow-md border-2 border-[#E5E7EB]">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#FFF7E5] rounded-lg flex items-center justify-center">
+                <Award className="w-6 h-6 text-[#F59E0B]" />
               </div>
               <div>
-                <div className="text-3xl font-extrabold" style={{color: '#D97706'}}>-</div>
-                <div className="text-sm font-semibold text-gray-600">Completed Exams</div>
+                <div className="text-3xl font-bold text-[#F59E0B]" style={{fontFamily: 'Manrope, sans-serif'}}>-</div>
+                <div className="text-sm font-medium text-[#6B7280]">Completed Exams</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Children Progress */}
-        <div className="bg-white rounded-3xl shadow-xl p-8 border-4" style={{borderColor: '#F59E0B'}}>
-          <h2 className="text-2xl font-extrabold mb-6" style={{color: '#92400E', fontFamily: 'Nunito'}}>
-            <Users className="inline w-6 h-6 mr-2" />
+        <div className="bg-white rounded-xl shadow-md p-6 md:p-8 border-2 border-[#E5E7EB]">
+          <h2 className="text-xl md:text-2xl font-bold mb-6 text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
             Your Children's Progress
           </h2>
 
           {children.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">👨‍👩‍👧‍👦</div>
-              <p className="text-lg text-gray-600 font-semibold mb-2">No children linked to your account yet</p>
-              <p className="text-sm text-gray-500 mb-6">Click "Link Student" to connect your child's account</p>
+              <p className="text-lg text-[#6B7280] font-semibold mb-2">No children linked yet</p>
+              <p className="text-sm text-[#9CA3AF] mb-6">Click "Link Student" to connect your child's account</p>
               <button
                 onClick={() => setShowLinkStudent(true)}
-                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl"
+                className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
               >
                 <Link2 className="inline w-5 h-5 mr-2" />
                 Link Your First Child
@@ -173,27 +166,27 @@ const ParentDashboard = () => {
               {children.map(child => (
                 <div
                   key={child.id}
-                  className="bg-gradient-to-br from-yellow-50 to-white rounded-2xl p-6 border-3 border-yellow-200 shadow-md hover:shadow-xl transition-all"
+                  className="bg-gradient-to-br from-[#FFF7E5] to-white rounded-xl p-6 border-2 border-[#F5E6B3] shadow-md hover:shadow-lg transition-all"
                   data-testid={`child-card-${child.id}`}
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-xl font-extrabold" style={{color: '#92400E'}}>{child.name}</h3>
-                      <p className="text-sm text-gray-600">{child.grade.replace('_', ' ').toUpperCase()}</p>
-                      <p className="text-xs text-gray-500 mt-1">{child.email}</p>
+                      <h3 className="text-xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{child.name}</h3>
+                      <p className="text-sm text-[#6B7280]">{child.grade.replace('_', ' ').toUpperCase()}</p>
+                      <p className="text-xs text-[#9CA3AF] mt-1">{child.email}</p>
                     </div>
-                    <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-[#FCD34D] rounded-full flex items-center justify-center">
                       <span className="text-2xl">🎓</span>
                     </div>
                   </div>
                   
                   <button
                     onClick={() => navigate(`/progress/${child.id}`)}
-                    className="w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all"
+                    className="w-full py-3 bg-[#F59E0B] text-white font-semibold rounded-lg hover:bg-[#D97706] transition-all"
                     data-testid={`view-progress-${child.id}`}
                   >
                     <BarChart3 className="inline w-5 h-5 mr-2" />
-                    View Blood Report 🩺
+                    View Progress Report
                   </button>
                 </div>
               ))}
@@ -205,34 +198,33 @@ const ParentDashboard = () => {
       {/* Link Student Modal */}
       {showLinkStudent && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <div className="bg-white rounded-3xl shadow-2xl border-4 p-8 max-w-md w-full" style={{borderColor: '#F59E0B'}}>
-            <h3 className="text-2xl font-extrabold mb-6" style={{color: '#92400E', fontFamily: 'Nunito'}}>
-              <Link2 className="inline w-6 h-6 mr-2" />
+          <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#E5E7EB] p-8 max-w-md w-full">
+            <h3 className="text-2xl font-bold mb-6 text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
               Link Student Account
             </h3>
 
             {availableStudents.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-600 mb-4">All students are already linked to your account!</p>
+                <p className="text-[#6B7280] mb-4">All students are already linked!</p>
                 <button
                   onClick={() => setShowLinkStudent(false)}
-                  className="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300"
+                  className="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300"
                 >
                   Close
                 </button>
               </div>
             ) : (
               <>
-                <p className="text-gray-600 mb-4">Select a student to link to your parent account:</p>
+                <p className="text-[#6B7280] mb-4">Select a student to link:</p>
                 
                 <div className="space-y-3 mb-6">
                   {availableStudents.map(student => (
                     <label
                       key={student.id}
-                      className={`flex items-center p-4 border-3 rounded-xl cursor-pointer transition-all ${
+                      className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
                         selectedStudent === student.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-300 hover:border-blue-300'
+                          ? 'border-[#F59E0B] bg-[#FFF7E5]'
+                          : 'border-[#E5E7EB] hover:border-[#F59E0B]'
                       }`}
                       data-testid={`student-option-${student.id}`}
                     >
@@ -245,9 +237,9 @@ const ParentDashboard = () => {
                         className="w-5 h-5 mr-3"
                       />
                       <div className="flex-1">
-                        <div className="font-bold" style={{color: '#92400E'}}>{student.name}</div>
-                        <div className="text-sm text-gray-600">{student.grade.replace('_', ' ').toUpperCase()}</div>
-                        <div className="text-xs text-gray-500">{student.email}</div>
+                        <div className="font-bold text-[#1F2937]">{student.name}</div>
+                        <div className="text-sm text-[#6B7280]">{student.grade.replace('_', ' ').toUpperCase()}</div>
+                        <div className="text-xs text-[#9CA3AF]">{student.email}</div>
                       </div>
                     </label>
                   ))}
@@ -256,14 +248,14 @@ const ParentDashboard = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowLinkStudent(false)}
-                    className="flex-1 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300"
+                    className="flex-1 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleLinkStudent}
                     disabled={!selectedStudent}
-                    className="flex-1 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50"
+                    className="flex-1 py-3 bg-[#F59E0B] text-white font-semibold rounded-lg hover:bg-[#D97706] disabled:opacity-50"
                     data-testid="confirm-link-student-button"
                   >
                     Link Student

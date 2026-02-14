@@ -49,24 +49,27 @@ const StudentDashboard = () => {
     <div className="min-h-screen bg-[#FFFBF0] bg-lined-paper">
       {/* Header with stars background */}
       <div className="bg-gradient-to-r from-[#FFF7E5] via-[#FFF1CC] to-[#FFF7E5] bg-stars-soft shadow-md border-b-4 border-[#F59E0B]">
-        <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 py-4">
+        <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 py-5 md:py-6">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-[#F59E0B] rounded-full flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-[#F59E0B] to-[#D97706] rounded-2xl flex items-center justify-center shadow-lg border-2 border-white">
+                <BookOpen className="w-7 h-7 md:w-8 md:h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-extrabold text-[#92400E]" style={{fontFamily: 'Manrope, sans-serif'}}>Student Dashboard</h1>
-                <p className="text-sm md:text-base text-[#374151]">Welcome, {user.full_name}! 🎓</p>
+                <h1 className="text-2xl md:text-4xl font-extrabold text-[#92400E] leading-tight" style={{fontFamily: 'Manrope, sans-serif', letterSpacing: '-0.02em'}}>Student Dashboard</h1>
+                <p className="text-sm md:text-lg font-semibold text-[#374151] flex items-center gap-2 mt-1">
+                  Welcome, <span className="text-[#F59E0B]">{user.full_name}</span>! 
+                  <span className="text-lg md:text-xl">🎓</span>
+                </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="px-3 md:px-4 py-2 bg-white rounded-xl border-2 border-[#F59E0B] shadow-sm">
-                <span className="font-bold text-[#92400E] text-sm md:text-base">{getGradeDisplay(user.grade)}</span>
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="px-3 md:px-5 py-2 md:py-3 bg-white rounded-xl border-3 border-[#F59E0B] shadow-md">
+                <span className="font-extrabold text-[#92400E] text-sm md:text-lg" style={{fontFamily: 'Manrope, sans-serif'}}>{getGradeDisplay(user.grade)}</span>
               </div>
               <button
                 onClick={logout}
-                className="px-3 md:px-4 py-2 bg-white text-[#374151] font-semibold rounded-xl hover:bg-[#FFF7E5] shadow-sm transition-colors"
+                className="px-3 md:px-4 py-2 md:py-3 bg-white text-[#374151] font-semibold rounded-xl hover:bg-[#FFF7E5] shadow-sm transition-colors border-2 border-transparent hover:border-[#F59E0B]"
               >
                 <LogOut className="inline w-4 h-4 mr-1" />
                 <span className="hidden md:inline">Logout</span>

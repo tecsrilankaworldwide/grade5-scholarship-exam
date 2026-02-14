@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { BookOpen, Mail, Lock } from 'lucide-react';
-import EducationReformsLogo from '../components/EducationReformsLogo';
+import ExamBureauLogo from '../components/ExamBureauLogo';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -39,9 +39,9 @@ const Login = () => {
       
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 py-12">
         <div className="max-w-2xl w-full">
-          {/* HUGE Custom Logo Header */}
+          {/* HUGE Arrow Starburst Logo */}
           <div className="mb-12">
-            <EducationReformsLogo size="large" />
+            <ExamBureauLogo size="large" />
           </div>
 
           {/* Subtitle */}

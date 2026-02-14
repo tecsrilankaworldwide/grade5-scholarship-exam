@@ -619,8 +619,18 @@ async def get_student_progress(student_id: str, current_user: User = Depends(get
     monthly_progress = []
     skill_trends = {skill.value: [] for skill in SkillArea}
     
+    # Batch fetch all exams to avoid N+1 query
+    exam_ids = [attempt["exam_id"] for attempt in attempts]
+    exams_list = await db.exams.find(
+        {"id": {"$in": exam_ids}}, 
+        {"_id": 0, "id": 1, "month": 1, "title": 1}
+    ).to_list(100)
+    exams_map = {exam["id"]: exam for exam in exams_list}
+    
     for attempt in attempts:
-        exam = await db.exams.find_one({"id": attempt["exam_id"]}, {"_id": 0, "month": 1, "title": 1})
+        exam = exams_map.get(attempt["exam_id"])
+        if not exam:
+            continue  # Skip if exam not found
         
         # Find corresponding Paper 2
         paper2 = next((p for p in paper2_subs if p["exam_id"] == attempt["exam_id"]), None)

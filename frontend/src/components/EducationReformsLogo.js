@@ -2,32 +2,48 @@ import React from 'react';
 
 const EducationReformsLogo = ({ size = 'large' }) => {
   const dimensions = {
-    small: { titleSize: 'text-2xl', dotSize: 6, gap: 6, cols: 3, rows: 6 },
-    medium: { titleSize: 'text-4xl', dotSize: 10, gap: 8, cols: 3, rows: 6 },
-    large: { titleSize: 'text-6xl md:text-7xl', dotSize: 14, gap: 10, cols: 3, rows: 6 },
+    small: { titleSize: 'text-2xl', dotSize: 8, groupGap: 12, colGap: 8, cols: 5, groupsPerCol: 5 },
+    medium: { titleSize: 'text-4xl', dotSize: 12, groupGap: 16, colGap: 12, cols: 5, groupsPerCol: 5 },
+    large: { titleSize: 'text-6xl md:text-7xl', dotSize: 16, groupGap: 20, colGap: 14, cols: 5, groupsPerCol: 5 },
   };
 
-  const { titleSize, dotSize, gap, cols, rows } = dimensions[size] || dimensions.large;
+  const { titleSize, dotSize, groupGap, colGap, cols, groupsPerCol } = dimensions[size] || dimensions.large;
 
-  // Generate dot grid
+  // Generate dot pattern - vertical groups of 3 dots
   const renderDots = () => {
-    const dots = [];
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        dots.push(
-          <div
-            key={`${row}-${col}`}
-            className="rounded-full"
-            style={{
-              width: `${dotSize}px`,
-              height: `${dotSize}px`,
-              backgroundColor: '#F59E0B',
-            }}
-          />
+    const columns = [];
+    for (let col = 0; col < cols; col++) {
+      const dotGroups = [];
+      for (let group = 0; group < groupsPerCol; group++) {
+        // Each group has 3 dots vertically
+        const dotsInGroup = [];
+        for (let dot = 0; dot < 3; dot++) {
+          dotsInGroup.push(
+            <div
+              key={`${col}-${group}-${dot}`}
+              className="rounded-full"
+              style={{
+                width: `${dotSize}px`,
+                height: `${dotSize}px`,
+                backgroundColor: '#1F2937',
+                marginBottom: dot < 2 ? '6px' : '0',
+              }}
+            />
+          );
+        }
+        dotGroups.push(
+          <div key={`${col}-${group}`} style={{ marginBottom: group < groupsPerCol - 1 ? `${groupGap}px` : '0' }}>
+            {dotsInGroup}
+          </div>
         );
       }
+      columns.push(
+        <div key={col} className="flex flex-col" style={{ marginRight: col < cols - 1 ? `${colGap}px` : '0' }}>
+          {dotGroups}
+        </div>
+      );
     }
-    return dots;
+    return columns;
   };
 
   return (
@@ -58,14 +74,8 @@ const EducationReformsLogo = ({ size = 'large' }) => {
           </h1>
         </div>
 
-        {/* Dot Grid */}
-        <div
-          className="grid"
-          style={{
-            gridTemplateColumns: `repeat(${cols}, ${dotSize}px)`,
-            gap: `${gap}px`,
-          }}
-        >
+        {/* Dot Pattern - Vertical groups */}
+        <div className="flex items-center">
           {renderDots()}
         </div>
       </div>

@@ -32,13 +32,8 @@ const StudentDashboard = () => {
   };
 
   const getGradeDisplay = (grade) => {
-    const gradeMap = {
-      'grade_2': 'Grade 2',
-      'grade_3': 'Grade 3',
-      'grade_4': 'Grade 4',
-      'grade_5': t('common.grade5')
-    };
-    return gradeMap[grade] || grade;
+    const gradeKey = grade?.replace('grade_', 'grade');
+    return t(`common.${gradeKey}`) || grade;
   };
 
   if (loading) {

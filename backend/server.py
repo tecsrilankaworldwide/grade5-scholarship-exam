@@ -656,15 +656,54 @@ async def root():
 
 @app.on_event("startup")
 async def startup_event():
-    """Create indexes"""
+    """Create indexes and seed sample data"""
     try:
         await db.users.create_index("email", unique=True)
         await db.exams.create_index([("grade", 1), ("month", 1)])
         await db.attempts.create_index([("student_id", 1), ("exam_id", 1)])
         await db.paper2_submissions.create_index([("student_id", 1), ("exam_id", 1)])
         logger.info("✓ Database indexes created")
+        
+        # Seed sample users if they don't exist
+        sample_users = [
+            {"id": "student_001", "email": "student@test.com", "full_name": "Sample Student", "password": get_password_hash("student123"), "role": "student", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True},
+            {"id": "teacher_001", "email": "teacher@test.com", "full_name": "Sample Teacher", "password": get_password_hash("teacher123"), "role": "teacher", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True},
+            {"id": "parent_001", "email": "parent@test.com", "full_name": "Sample Parent", "password": get_password_hash("parent123"), "role": "parent", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True, "linked_student_id": "student_001"},
+            {"id": "admin_001", "email": "admin@test.com", "full_name": "Sample Admin", "password": get_password_hash("admin123"), "role": "admin", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True}
+        ]
+        
+        for user in sample_users:
+            existing = await db.users.find_one({"email": user["email"]})
+            if not existing:
+                await db.users.insert_one(user)
+                logger.info(f"✓ Created sample user: {user['email']}")
+            else:
+                logger.info(f"Sample user already exists: {user['email']}")
+                
+        # Seed sample exam if none exists
+        existing_exam = await db.exams.find_one({})
+        if not existing_exam:
+            sample_exam = {
+                "id": str(uuid.uuid4()),
+                "title": "January 2024 - Grade 5 Scholarship Practice Exam",
+                "grade": "grade_5",
+                "month": "2024-01",
+                "paper_number": 1,
+                "duration_minutes": 60,
+                "total_questions": 60,
+                "questions": [
+                    {"question_number": i+1, "question_text": f"Sample question {i+1}", "options": ["Option A", "Option B", "Option C", "Option D"], "correct_answer": "A", "skill_area": ["mathematical_reasoning", "language_proficiency", "general_knowledge", "comprehension_skills", "problem_solving"][i % 5]}
+                    for i in range(60)
+                ],
+                "is_active": True,
+                "created_by": "admin_001",
+                "created_at": datetime.now(timezone.utc)
+            }
+            await db.exams.insert_one(sample_exam)
+            logger.info("✓ Created sample exam")
+                
     except Exception as e:
-        logger.error(f"Error creating indexes: {e}")
+        logger.error(f"Error in startup: {e}")
 
 if __name__ == "__main__":
     import uvicorn

@@ -224,6 +224,18 @@ const ExamInterface = () => {
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
   const answeredCount = Object.keys(answers).length;
 
+  // Safety check - if no current question, show loading
+  if (!currentQuestion) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{background: '#FFFBF0'}}>
+        <div className="text-center">
+          <div className="spinner mx-auto mb-4"></div>
+          <p className="text-lg font-semibold text-yellow-800">Loading Question...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen" style={{background: '#FFFBF0'}}>
       {/* Header with Timer */}

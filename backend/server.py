@@ -17,6 +17,9 @@ from passlib.context import CryptContext
 import uuid
 from enum import Enum
 import logging
+from functools import lru_cache
+import asyncio
+from cachetools import TTLCache
 
 # Load environment variables
 load_dotenv()
@@ -34,6 +37,28 @@ client = AsyncIOMotorClient(
     socketTimeoutMS=45000
 )
 db = client[os.environ.get('DB_NAME_EXAM', 'exam_bureau_db')]
+
+# In-memory caching for high-traffic optimization (1K concurrent users)
+# TTLCache: maxsize=1000 items, ttl=300 seconds (5 min)
+exam_cache = TTLCache(maxsize=1000, ttl=300)
+user_cache = TTLCache(maxsize=5000, ttl=60)  # Short TTL for user data
+
+async def get_cached_exams(grade: str, status: str = None):
+    """Get exams with caching for high traffic"""
+    cache_key = f"exams_{grade}_{status}"
+    if cache_key in exam_cache:
+        return exam_cache[cache_key]
+    
+    query = {"grade": grade, "is_active": True}
+    if status == "published":
+        query["is_active"] = True
+    exams = await db.exams.find(query).to_list(100)
+    exam_cache[cache_key] = exams
+    return exams
+
+def invalidate_exam_cache():
+    """Clear exam cache when exams are modified"""
+    exam_cache.clear()
 
 # Security
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

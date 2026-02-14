@@ -736,12 +736,12 @@ async def startup_event():
         for config in grades_config:
             existing_exam = await db.exams.find_one({"grade": config["grade"]})
             if not existing_exam:
-                # Create February 2024 exam
+                # Create February 2025 exam
                 sample_exam = {
                     "id": str(uuid.uuid4()),
-                    "title": f"February 2024 - {config['title_prefix']}",
+                    "title": f"February 2025 - {config['title_prefix']}",
                     "grade": config["grade"],
-                    "month": "2024-02",
+                    "month": "2025-02",
                     "paper_number": 1,
                     "duration_minutes": config["duration"],
                     "total_questions": config["questions"],
@@ -767,12 +767,12 @@ async def startup_event():
                 await db.exams.insert_one(sample_exam)
                 logger.info(f"✓ Created sample exam for {config['grade']}")
                 
-                # Create January 2024 exam as well
+                # Create January 2025 exam as well
                 sample_exam_jan = {
                     "id": str(uuid.uuid4()),
-                    "title": f"January 2024 - {config['title_prefix']}",
+                    "title": f"January 2025 - {config['title_prefix']}",
                     "grade": config["grade"],
-                    "month": "2024-01",
+                    "month": "2025-01",
                     "paper_number": 1,
                     "duration_minutes": config["duration"],
                     "total_questions": config["questions"],

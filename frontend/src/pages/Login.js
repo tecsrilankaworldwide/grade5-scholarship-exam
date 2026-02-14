@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import { BookOpen, Mail, Lock, Award, Star } from 'lucide-react';
+import { BookOpen, Mail, Lock } from 'lucide-react';
+import ExamBureauLogo from '../components/ExamBureauLogo';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -37,56 +38,27 @@ const Login = () => {
       <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-[#FCD34D] rounded-full opacity-10 blur-2xl"></div>
       
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 py-12">
-        <div className="max-w-xl w-full">
-          {/* HUGE Header with dramatic styling */}
-          <div className="text-center mb-12">
-            {/* Big Logo */}
-            <div className="inline-block relative mb-8">
-              <div className="w-28 h-28 md:w-36 md:h-36 bg-gradient-to-br from-[#F59E0B] via-[#FB923C] to-[#F59E0B] rounded-3xl shadow-2xl flex items-center justify-center mx-auto border-8 border-white transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                <Award className="w-16 h-16 md:w-20 md:h-20 text-white" strokeWidth={3} />
-              </div>
-              <div className="absolute -top-2 -right-2 w-12 h-12 bg-[#FCD34D] rounded-full flex items-center justify-center shadow-lg animate-bounce">
-                <Star className="w-6 h-6 text-[#92400E]" fill="#92400E" />
-              </div>
-            </div>
-            
-            {/* HUGE Main Title */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-none" style={{
-              fontFamily: 'Manrope, sans-serif',
-              letterSpacing: '-0.03em',
-              background: 'linear-gradient(135deg, #92400E 0%, #B45309 50%, #92400E 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              textShadow: '0 4px 8px rgba(0,0,0,0.1)'
-            }}>
-              Examination<br/>Bureau
-            </h1>
-            
-            {/* Decorative divider with stars */}
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <Star className="w-5 h-5 md:w-6 md:h-6 text-[#F59E0B]" fill="#F59E0B" />
-              <div className="h-1.5 w-20 md:w-32 bg-gradient-to-r from-transparent via-[#F59E0B] to-transparent rounded-full"></div>
-              <Star className="w-5 h-5 md:w-6 md:h-6 text-[#F59E0B]" fill="#F59E0B" />
-            </div>
-            
-            {/* Large Subtitle */}
-            <p className="text-2xl md:text-4xl lg:text-5xl font-extrabold text-[#78350F] mb-4" style={{fontFamily: 'Manrope, sans-serif'}}>
-              Grade 5 Scholarship Portal
+        <div className="max-w-2xl w-full">
+          {/* HUGE Custom Logo Header */}
+          <div className="mb-12">
+            <ExamBureauLogo size="large" />
+          </div>
+
+          {/* Subtitle */}
+          <div className="text-center mb-10">
+            <p className="text-2xl md:text-3xl font-extrabold text-[#78350F] mb-2" style={{fontFamily: 'Manrope, sans-serif'}}>
+              Grade 5 Scholarship Exam Portal
             </p>
-            
-            {/* Tagline */}
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border-3 border-[#FCD34D]">
-              <span className="text-xl md:text-2xl">🏆</span>
-              <p className="text-base md:text-xl font-bold text-[#92400E]" style={{fontFamily: 'Figtree, sans-serif'}}>
-                Building Future Scholars
+            <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/70 backdrop-blur-sm rounded-full shadow-md border-2 border-[#FCD34D]">
+              <span className="text-lg">🎯</span>
+              <p className="text-base md:text-lg font-semibold text-[#92400E]" style={{fontFamily: 'Figtree, sans-serif'}}>
+                Excellence in Education Since 1982
               </p>
-              <span className="text-xl md:text-2xl">🏆</span>
             </div>
           </div>
 
           {/* Login Card with dramatic styling */}
-          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border-4 border-[#F59E0B] transform hover:scale-[1.02] transition-transform duration-300">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border-4 border-[#F59E0B] transform hover:scale-[1.01] transition-transform duration-300">
             {/* Card Header */}
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[#FFF7E5] to-[#FED7AA] rounded-2xl border-3 border-[#F59E0B] mb-4">
@@ -169,14 +141,6 @@ const Login = () => {
             <div className="mt-8 pt-6 border-t-3 border-[#F5E6B3] text-center">
               <p className="text-base md:text-lg text-[#78350F] font-semibold mb-2">Need help?</p>
               <p className="text-sm md:text-base text-[#92400E]">Contact your administrator</p>
-            </div>
-          </div>
-          
-          {/* Bottom branding */}
-          <div className="text-center mt-8">
-            <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/60 backdrop-blur-sm rounded-full shadow-lg">
-              <span className="text-lg">🏫</span>
-              <p className="text-sm md:text-base font-bold text-[#92400E]">Excellence in Education Since 1982</p>
             </div>
           </div>
         </div>

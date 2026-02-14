@@ -53,6 +53,8 @@ const ExamInterface = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
+      console.log('Exam start response:', response.data);
+      
       setExam(response.data.exam);
       setAttempt(response.data.attempt);
       setAnswers(response.data.attempt.answers || {});
@@ -62,6 +64,9 @@ const ExamInterface = () => {
         const elapsed = (new Date() - new Date(response.data.attempt.started_at)) / 1000;
         const remaining = Math.max(0, response.data.exam.duration_minutes * 60 - elapsed);
         setTimeLeft(Math.floor(remaining));
+      } else {
+        // Set initial time for new exam
+        setTimeLeft(response.data.exam.duration_minutes * 60);
       }
       
       setLoading(false);

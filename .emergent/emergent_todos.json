@@ -25,6 +25,10 @@
   },
   {
     "content": "Final comprehensive testing after improvements",
-    "status": "in_progress"
+    "status": "completed"
+  },
+  {
+    "content": "Add data-testid attributes to exam cards",
+    "status": "completed"
   }
 ]

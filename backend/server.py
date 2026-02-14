@@ -689,11 +689,19 @@ async def startup_event():
         await db.paper2_submissions.create_index([("student_id", 1), ("exam_id", 1)])
         logger.info("✓ Database indexes created")
         
-        # Seed sample users if they don't exist
+        # Seed sample users for all grades
         sample_users = [
-            {"id": "student_001", "email": "student@test.com", "full_name": "Sample Student", "hashed_password": get_password_hash("student123"), "role": "student", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True},
+            # Grade 5 users
+            {"id": "student_g5_001", "email": "student@test.com", "full_name": "Grade 5 Student", "hashed_password": get_password_hash("student123"), "role": "student", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True},
+            # Grade 4 users
+            {"id": "student_g4_001", "email": "student4@test.com", "full_name": "Grade 4 Student", "hashed_password": get_password_hash("student123"), "role": "student", "grade": "grade_4", "created_at": datetime.now(timezone.utc), "is_active": True},
+            # Grade 3 users
+            {"id": "student_g3_001", "email": "student3@test.com", "full_name": "Grade 3 Student", "hashed_password": get_password_hash("student123"), "role": "student", "grade": "grade_3", "created_at": datetime.now(timezone.utc), "is_active": True},
+            # Grade 2 users
+            {"id": "student_g2_001", "email": "student2@test.com", "full_name": "Grade 2 Student", "hashed_password": get_password_hash("student123"), "role": "student", "grade": "grade_2", "created_at": datetime.now(timezone.utc), "is_active": True},
+            # Staff users
             {"id": "teacher_001", "email": "teacher@test.com", "full_name": "Sample Teacher", "hashed_password": get_password_hash("teacher123"), "role": "teacher", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True},
-            {"id": "parent_001", "email": "parent@test.com", "full_name": "Sample Parent", "hashed_password": get_password_hash("parent123"), "role": "parent", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True, "linked_student_id": "student_001"},
+            {"id": "parent_001", "email": "parent@test.com", "full_name": "Sample Parent", "hashed_password": get_password_hash("parent123"), "role": "parent", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True, "linked_student_id": "student_g5_001"},
             {"id": "admin_001", "email": "admin@test.com", "full_name": "Sample Admin", "hashed_password": get_password_hash("admin123"), "role": "admin", "grade": "grade_5", "created_at": datetime.now(timezone.utc), "is_active": True}
         ]
         
@@ -705,27 +713,80 @@ async def startup_event():
             else:
                 logger.info(f"Sample user already exists: {user['email']}")
                 
-        # Seed sample exam if none exists
-        existing_exam = await db.exams.find_one({})
-        if not existing_exam:
-            sample_exam = {
-                "id": str(uuid.uuid4()),
-                "title": "January 2024 - Grade 5 Scholarship Practice Exam",
-                "grade": "grade_5",
-                "month": "2024-01",
-                "paper_number": 1,
-                "duration_minutes": 60,
-                "total_questions": 60,
-                "questions": [
-                    {"question_number": i+1, "question_text": f"Sample question {i+1}", "options": ["Option A", "Option B", "Option C", "Option D"], "correct_answer": "A", "skill_area": ["mathematical_reasoning", "language_proficiency", "general_knowledge", "comprehension_skills", "problem_solving"][i % 5]}
-                    for i in range(60)
-                ],
-                "is_active": True,
-                "created_by": "admin_001",
-                "created_at": datetime.now(timezone.utc)
-            }
-            await db.exams.insert_one(sample_exam)
-            logger.info("✓ Created sample exam")
+        # Seed sample exams for ALL grades
+        grades_config = [
+            {"grade": "grade_2", "title_prefix": "Grade 2 Model Exam", "questions": 40, "duration": 45},
+            {"grade": "grade_3", "title_prefix": "Grade 3 Model Exam", "questions": 50, "duration": 50},
+            {"grade": "grade_4", "title_prefix": "Grade 4 Model Exam", "questions": 55, "duration": 55},
+            {"grade": "grade_5", "title_prefix": "Grade 5 Scholarship Practice Exam", "questions": 60, "duration": 60}
+        ]
+        
+        skill_areas = ["mathematical_reasoning", "language_proficiency", "general_knowledge", "comprehension_skills", "problem_solving"]
+        
+        for config in grades_config:
+            existing_exam = await db.exams.find_one({"grade": config["grade"]})
+            if not existing_exam:
+                # Create February 2024 exam
+                sample_exam = {
+                    "id": str(uuid.uuid4()),
+                    "title": f"February 2024 - {config['title_prefix']}",
+                    "grade": config["grade"],
+                    "month": "2024-02",
+                    "paper_number": 1,
+                    "duration_minutes": config["duration"],
+                    "total_questions": config["questions"],
+                    "status": "published",
+                    "paper1_questions": [
+                        {
+                            "question_number": i+1, 
+                            "question_text": f"Sample question {i+1} for {config['grade'].replace('_', ' ')}", 
+                            "question_text_si": f"ප්‍රශ්නය {i+1} - {config['grade'].replace('_', ' ')}", 
+                            "question_text_ta": f"கேள்வி {i+1} - {config['grade'].replace('_', ' ')}", 
+                            "options": ["Option A", "Option B", "Option C", "Option D"],
+                            "options_si": ["විකල්පය A", "විකල්පය B", "විකල්පය C", "විකල්පය D"],
+                            "options_ta": ["விருப்பம் A", "விருப்பம் B", "விருப்பம் C", "விருப்பம் D"],
+                            "correct_answer": ["A", "B", "C", "D"][i % 4], 
+                            "skill_area": skill_areas[i % 5]
+                        }
+                        for i in range(config["questions"])
+                    ],
+                    "is_active": True,
+                    "created_by": "admin_001",
+                    "created_at": datetime.now(timezone.utc)
+                }
+                await db.exams.insert_one(sample_exam)
+                logger.info(f"✓ Created sample exam for {config['grade']}")
+                
+                # Create January 2024 exam as well
+                sample_exam_jan = {
+                    "id": str(uuid.uuid4()),
+                    "title": f"January 2024 - {config['title_prefix']}",
+                    "grade": config["grade"],
+                    "month": "2024-01",
+                    "paper_number": 1,
+                    "duration_minutes": config["duration"],
+                    "total_questions": config["questions"],
+                    "status": "published",
+                    "paper1_questions": [
+                        {
+                            "question_number": i+1, 
+                            "question_text": f"January Q{i+1} for {config['grade'].replace('_', ' ')}", 
+                            "question_text_si": f"ජනවාරි ප්‍රශ්නය {i+1}", 
+                            "question_text_ta": f"ஜனவரி கேள்வி {i+1}", 
+                            "options": ["Option A", "Option B", "Option C", "Option D"],
+                            "options_si": ["විකල්පය A", "විකල්පය B", "විකල්පය C", "විකල්පය D"],
+                            "options_ta": ["விருப்பம் A", "விருப்பம் B", "விருப்பம் C", "விருப்பம் D"],
+                            "correct_answer": ["A", "B", "C", "D"][(i+1) % 4], 
+                            "skill_area": skill_areas[i % 5]
+                        }
+                        for i in range(config["questions"])
+                    ],
+                    "is_active": True,
+                    "created_by": "admin_001",
+                    "created_at": datetime.now(timezone.utc)
+                }
+                await db.exams.insert_one(sample_exam_jan)
+                logger.info(f"✓ Created January exam for {config['grade']}")
                 
     except Exception as e:
         logger.error(f"Error in startup: {e}")

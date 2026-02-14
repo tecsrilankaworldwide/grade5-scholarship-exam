@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth, API } from '../AuthContext';
 import axios from 'axios';
 import { Users, TrendingUp, Award, LogOut, BarChart3, Link2, BookOpen } from 'lucide-react';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const ParentDashboard = () => {
+  const { t } = useTranslation();
   const { user, token, logout } = useAuth();
   const navigate = useNavigate();
   const [children, setChildren] = useState([]);
@@ -76,25 +79,27 @@ const ParentDashboard = () => {
                 <Users className="w-7 h-7 text-white" strokeWidth={2.5} />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>Parent Portal</h1>
-                <p className="text-sm md:text-base text-[#6B7280]">Welcome, <span className="font-semibold text-[#F59E0B]">{user.full_name}</span></p>
+                <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{t('dashboard.parent')}</h1>
+                <p className="text-sm md:text-base text-[#6B7280]">{t('dashboard.welcome')}, <span className="font-semibold text-[#F59E0B]">{user.full_name}</span></p>
               </div>
             </div>
             <div className="flex gap-3">
+              <LanguageSwitcher />
               <button
                 onClick={() => setShowLinkStudent(true)}
                 className="px-3 md:px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base"
                 data-testid="link-student-button"
               >
                 <Link2 className="inline w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Link</span>
+                <span className="hidden sm:inline">{t('parent.linkStudent')}</span>
               </button>
               <button
                 onClick={logout}
                 className="px-3 md:px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                data-testid="logout-btn"
               >
                 <LogOut className="inline w-4 h-4 mr-1" />
-                <span className="hidden md:inline">Logout</span>
+                <span className="hidden md:inline">{t('auth.logout')}</span>
               </button>
             </div>
           </div>
@@ -112,7 +117,7 @@ const ParentDashboard = () => {
               </div>
               <div>
                 <div className="text-3xl font-bold text-[#3B82F6]" style={{fontFamily: 'Manrope, sans-serif'}}>{children.length}</div>
-                <div className="text-sm font-medium text-[#6B7280]">Linked Children</div>
+                <div className="text-sm font-medium text-[#6B7280]">{t('parent.linkedChildren')}</div>
               </div>
             </div>
           </div>
@@ -124,7 +129,7 @@ const ParentDashboard = () => {
               </div>
               <div>
                 <div className="text-3xl font-bold text-[#10B981]" style={{fontFamily: 'Manrope, sans-serif'}}>-</div>
-                <div className="text-sm font-medium text-[#6B7280]">Avg Progress</div>
+                <div className="text-sm font-medium text-[#6B7280]">{t('parent.avgProgress')}</div>
               </div>
             </div>
           </div>
@@ -136,7 +141,7 @@ const ParentDashboard = () => {
               </div>
               <div>
                 <div className="text-3xl font-bold text-[#F59E0B]" style={{fontFamily: 'Manrope, sans-serif'}}>-</div>
-                <div className="text-sm font-medium text-[#6B7280]">Completed Exams</div>
+                <div className="text-sm font-medium text-[#6B7280]">{t('parent.completedExams')}</div>
               </div>
             </div>
           </div>
@@ -145,20 +150,20 @@ const ParentDashboard = () => {
         {/* Children Progress */}
         <div className="bg-white rounded-xl shadow-md p-6 md:p-8 border-2 border-[#E5E7EB]">
           <h2 className="text-xl md:text-2xl font-bold mb-6 text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
-            Your Children's Progress
+            {t('parent.childrenProgress')}
           </h2>
 
           {children.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">👨‍👩‍👧‍👦</div>
-              <p className="text-lg text-[#6B7280] font-semibold mb-2">No children linked yet</p>
-              <p className="text-sm text-[#9CA3AF] mb-6">Click "Link Student" to connect your child's account</p>
+              <p className="text-lg text-[#6B7280] font-semibold mb-2">{t('progress.noData')}</p>
+              <p className="text-sm text-[#9CA3AF] mb-6">{t('auth.needHelp')}</p>
               <button
                 onClick={() => setShowLinkStudent(true)}
                 className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
               >
                 <Link2 className="inline w-5 h-5 mr-2" />
-                Link Your First Child
+                {t('parent.linkStudent')}
               </button>
             </div>
           ) : (
@@ -186,7 +191,7 @@ const ParentDashboard = () => {
                     data-testid={`view-progress-${child.id}`}
                   >
                     <BarChart3 className="inline w-5 h-5 mr-2" />
-                    View Progress Report
+                    {t('progress.viewProgress')}
                   </button>
                 </div>
               ))}
@@ -200,22 +205,22 @@ const ParentDashboard = () => {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6">
           <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#E5E7EB] p-8 max-w-md w-full">
             <h3 className="text-2xl font-bold mb-6 text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
-              Link Student Account
+              {t('parent.linkStudent')}
             </h3>
 
             {availableStudents.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-[#6B7280] mb-4">All students are already linked!</p>
+                <p className="text-[#6B7280] mb-4">{t('progress.noData')}</p>
                 <button
                   onClick={() => setShowLinkStudent(false)}
                   className="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300"
                 >
-                  Close
+                  {t('common.cancel')}
                 </button>
               </div>
             ) : (
               <>
-                <p className="text-[#6B7280] mb-4">Select a student to link:</p>
+                <p className="text-[#6B7280] mb-4">{t('auth.signInDesc')}</p>
                 
                 <div className="space-y-3 mb-6">
                   {availableStudents.map(student => (
@@ -250,7 +255,7 @@ const ParentDashboard = () => {
                     onClick={() => setShowLinkStudent(false)}
                     className="flex-1 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300"
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button
                     onClick={handleLinkStudent}
@@ -258,7 +263,7 @@ const ParentDashboard = () => {
                     className="flex-1 py-3 bg-[#F59E0B] text-white font-semibold rounded-lg hover:bg-[#D97706] disabled:opacity-50"
                     data-testid="confirm-link-student-button"
                   >
-                    Link Student
+                    {t('parent.linkStudent')}
                   </button>
                 </div>
               </>

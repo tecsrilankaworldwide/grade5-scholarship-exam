@@ -1,0 +1,34 @@
+[
+  {
+    "content": "Fix critical ExamInterface bug (loading state issue)",
+    "status": "completed"
+  },
+  {
+    "content": "Implement Teacher Exam Creation UI with full question builder",
+    "status": "completed"
+  },
+  {
+    "content": "Implement Paper 2 Marking Interface for teachers",
+    "status": "completed"
+  },
+  {
+    "content": "Add User Management features in Admin Dashboard",
+    "status": "completed"
+  },
+  {
+    "content": "Link parent account to actual student data with selection",
+    "status": "completed"
+  },
+  {
+    "content": "Add loading states and better error handling across all pages",
+    "status": "completed"
+  },
+  {
+    "content": "Final comprehensive testing after improvements",
+    "status": "completed"
+  },
+  {
+    "content": "Add data-testid attributes to exam cards",
+    "status": "completed"
+  }
+]

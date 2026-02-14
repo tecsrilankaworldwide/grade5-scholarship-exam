@@ -3,16 +3,26 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+<<<<<<< HEAD
     "axios": "^1.13.5",
+=======
+    "axios": "^1.6.2",
+>>>>>>> 4ee35018177a3705523316c49228955afe58e27f
     "i18next": "^25.8.7",
     "i18next-browser-languagedetector": "^8.2.1",
     "lucide-react": "^0.292.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^16.5.4",
+<<<<<<< HEAD
     "react-router-dom": "^7.13.0",
     "react-scripts": "^5.0.1",
     "recharts": "^3.7.0",
+=======
+    "react-router-dom": "^6.20.0",
+    "react-scripts": "^5.0.1",
+    "recharts": "^2.10.3",
+>>>>>>> 4ee35018177a3705523316c49228955afe58e27f
     "tailwindcss-animate": "^1.0.7"
   },
   "scripts": {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth, API } from '../AuthContext';
 import axios from 'axios';
-import { Clock, Flag, CheckCircle, AlertCircle } from 'lucide-react';
+import { Clock, Flag, CheckCircle, AlertCircle, BookOpen, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const ExamInterface = () => {
   const { examId } = useParams();
@@ -13,7 +13,7 @@ const ExamInterface = () => {
   const [attempt, setAttempt] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(3600); // 60 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(3600);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
@@ -22,20 +22,14 @@ const ExamInterface = () => {
   useEffect(() => {
     startOrResumeExam();
   }, []);
-  
-  // Debug: Monitor result state changes
-  useEffect(() => {
-    console.log('Result state changed:', result);
-  }, [result]);
 
-  // Timer countdown
   useEffect(() => {
     if (!exam || result) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          handleSubmit(); // Auto-submit when time runs out
+          handleSubmit();
           return 0;
         }
         return prev - 1;
@@ -52,77 +46,59 @@ const ExamInterface = () => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      console.log('Exam start response:', response.data);
-      
       setExam(response.data.exam);
       setAttempt(response.data.attempt);
       setAnswers(response.data.attempt.answers || {});
-      
-      if (response.data.resume) {
-        // Calculate remaining time if resuming
-        const elapsed = (new Date() - new Date(response.data.attempt.started_at)) / 1000;
-        const remaining = Math.max(0, response.data.exam.duration_minutes * 60 - elapsed);
-        setTimeLeft(Math.floor(remaining));
-      } else {
-        // Set initial time for new exam
-        setTimeLeft(response.data.exam.duration_minutes * 60);
-      }
-      
+      setTimeLeft(response.data.time_left);
       setLoading(false);
     } catch (error) {
       console.error('Failed to start exam:', error);
-      alert('Failed to load exam. Please try again.');
+      alert('Failed to start exam: ' + (error.response?.data?.detail || error.message));
       navigate('/dashboard');
     }
   };
 
-  const handleAnswer = async (questionId, optionId) => {
-    const newAnswers = { ...answers, [questionId]: optionId };
-    setAnswers(newAnswers);
-
-    // Auto-save
-    try {
-      await axios.post(
-        `${API}/attempts/${attempt.id}/save`,
-        { question_id: questionId, selected_option: optionId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-    } catch (error) {
-      console.error('Failed to save answer:', error);
-    }
+  const handleAnswerSelect = (questionId, option) => {
+    setAnswers(prev => ({
+      ...prev,
+      [questionId]: option
+    }));
   };
 
   const handleSubmit = async () => {
     if (submitting) return;
     
-    const questions = exam.questions || [];
-    const unanswered = questions.filter(q => !answers[q.id]).length;
+    const confirmed = window.confirm(
+      `Are you sure you want to submit your exam?\n\nAnswered: ${Object.keys(answers).length}/${exam.questions.length}`
+    );
     
-    if (unanswered > 0) {
-      const confirmSubmit = window.confirm(`You have ${unanswered} unanswered questions. Submit anyway?`);
-      if (!confirmSubmit) return;
-    }
+    if (!confirmed) return;
 
     setSubmitting(true);
-    
     try {
-      console.log('Submitting exam...');
       const response = await axios.post(
-        `${API}/attempts/${attempt.id}/submit`,
-        {},
+        `${API}/exams/${examId}/submit`,
+        { answers },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      console.log('Exam submitted successfully, setting result:', response.data);
-      // Set result to show results page
       setResult(response.data);
-      setSubmitting(false);
     } catch (error) {
-      console.error('Failed to submit:', error);
-      alert(`Submission failed: ${error.response?.data?.detail || error.message || 'Please try again.'}`);
+      console.error('Failed to submit exam:', error);
+      alert('Failed to submit exam: ' + (error.response?.data?.detail || error.message));
       setSubmitting(false);
     }
+  };
+
+  const toggleFlag = (questionId) => {
+    setFlagged(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(questionId)) {
+        newSet.delete(questionId);
+      } else {
+        newSet.add(questionId);
+      }
+      return newSet;
+    });
   };
 
   const formatTime = (seconds) => {
@@ -131,22 +107,12 @@ const ExamInterface = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const toggleFlag = (questionId) => {
-    const newFlagged = new Set(flagged);
-    if (newFlagged.has(questionId)) {
-      newFlagged.delete(questionId);
-    } else {
-      newFlagged.add(questionId);
-    }
-    setFlagged(newFlagged);
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{background: '#FFFBF0'}}>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6]">
         <div className="text-center">
           <div className="spinner mx-auto mb-4"></div>
-          <p className="text-lg font-semibold text-yellow-800">Loading Exam...</p>
+          <p className="text-xl font-semibold text-[#92400E]">Loading your exam...</p>
         </div>
       </div>
     );
@@ -154,46 +120,46 @@ const ExamInterface = () => {
 
   if (result) {
     return (
-      <div className="min-h-screen p-6" style={{background: 'linear-gradient(135deg, #FFF9E6, #FFFACD)'}}>
+      <div className="min-h-screen bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6] p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-3xl shadow-2xl p-10 border-4" style={{borderColor: '#10B981'}}>
+          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 border-2 border-[#10B981]">
             <div className="text-center mb-8">
-              <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-12 h-12 text-green-600" />
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-10 h-10 md:w-12 md:h-12 text-green-600" />
               </div>
-              <h1 className="text-4xl font-extrabold mb-2" style={{color: '#059669', fontFamily: 'Nunito'}}>Exam Submitted!</h1>
-              <p className="text-lg text-gray-600">Great job completing the exam!</p>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-green-600" style={{fontFamily: 'Manrope, sans-serif'}}>Exam Submitted Successfully!</h1>
+              <p className="text-base md:text-lg text-[#6B7280]">Great job completing the exam!</p>
             </div>
 
             {/* Score Card */}
-            <div className="bg-gradient-to-r from-yellow-50 to-green-50 rounded-2xl p-8 mb-6 border-3" style={{borderColor: '#FCD34D'}}>
-              <div className="grid grid-cols-3 gap-6 text-center">
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 md:p-8 mb-6 border-2 border-[#E5E7EB]">
+              <div className="grid grid-cols-3 gap-4 md:gap-6 text-center">
                 <div>
-                  <div className="text-5xl font-extrabold mb-2" style={{color: '#059669', fontFamily: 'Nunito'}}>{result.score}</div>
-                  <div className="text-sm font-semibold text-gray-600">Your Score</div>
+                  <div className="text-4xl md:text-5xl font-bold mb-2 text-green-600" style={{fontFamily: 'Manrope, sans-serif'}}>{result.score}</div>
+                  <div className="text-xs md:text-sm font-semibold text-[#6B7280]">Your Score</div>
                 </div>
                 <div>
-                  <div className="text-5xl font-extrabold mb-2" style={{color: '#92400E', fontFamily: 'Nunito'}}>{result.total}</div>
-                  <div className="text-sm font-semibold text-gray-600">Total Marks</div>
+                  <div className="text-4xl md:text-5xl font-bold mb-2 text-[#92400E]" style={{fontFamily: 'Manrope, sans-serif'}}>{result.total}</div>
+                  <div className="text-xs md:text-sm font-semibold text-[#6B7280]">Total Marks</div>
                 </div>
                 <div>
-                  <div className="text-5xl font-extrabold mb-2" style={{color: '#F59E0B', fontFamily: 'Nunito'}}>{result.percentage}%</div>
-                  <div className="text-sm font-semibold text-gray-600">Percentage</div>
+                  <div className="text-4xl md:text-5xl font-bold mb-2 text-[#F59E0B]" style={{fontFamily: 'Manrope, sans-serif'}}>{result.percentage}%</div>
+                  <div className="text-xs md:text-sm font-semibold text-[#6B7280]">Percentage</div>
                 </div>
               </div>
             </div>
 
             {/* Skill Breakdown */}
             <div className="mb-8">
-              <h3 className="text-2xl font-bold mb-4" style={{color: '#92400E'}}>Performance by Skill</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <h3 className="text-xl md:text-2xl font-bold mb-4 text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>Performance by Skill</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Object.entries(result.skill_percentages || {}).map(([skill, percentage]) => (
-                  <div key={skill} className="bg-white border-2 border-yellow-200 rounded-xl p-4">
+                  <div key={skill} className="bg-white border-2 border-[#E5E7EB] rounded-lg p-4">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-semibold text-gray-700 capitalize">
+                      <span className="text-sm font-semibold text-[#374151] capitalize">
                         {skill.replace(/_/g, ' ')}
                       </span>
-                      <span className="text-xl font-bold" style={{color: percentage >= 70 ? '#059669' : percentage >= 50 ? '#F59E0B' : '#DC2626'}}>
+                      <span className="text-lg md:text-xl font-bold" style={{color: percentage >= 70 ? '#10B981' : percentage >= 50 ? '#F59E0B' : '#EF4444'}}>
                         {percentage}%
                       </span>
                     </div>
@@ -213,8 +179,8 @@ const ExamInterface = () => {
 
             <button
               onClick={() => navigate('/dashboard')}
-              className="w-full py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl"
-              style={{fontSize: '18px'}}
+              className="w-full py-4 bg-[#F59E0B] text-white font-bold rounded-lg hover:bg-[#D97706] transition-all text-base md:text-lg"
+              style={{fontFamily: 'Manrope, sans-serif'}}
             >
               Back to Dashboard →
             </button>
@@ -229,110 +195,98 @@ const ExamInterface = () => {
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
   const answeredCount = Object.keys(answers).length;
 
-  // Safety check - if no current question, show loading
   if (!currentQuestion) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{background: '#FFFBF0'}}>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6]">
         <div className="text-center">
           <div className="spinner mx-auto mb-4"></div>
-          <p className="text-lg font-semibold text-yellow-800">Loading Question...</p>
+          <p className="text-lg font-semibold text-[#92400E]">Loading Question...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{background: '#FFFBF0'}}>
+    <div className="min-h-screen bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6]">
       {/* Header with Timer */}
-      <div className="bg-white shadow-md border-b-4" style={{borderColor: '#F59E0B'}}>
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold" style={{color: '#92400E'}}>{exam.title}</h1>
-              <p className="text-sm text-gray-600">Question {currentQuestionIndex + 1} of {questions.length}</p>
-            </div>
-            
-            <div className="flex items-center gap-6">
-              <div className="text-center">
-                <div className="text-sm text-gray-600">Answered</div>
-                <div className="text-2xl font-bold" style={{color: '#059669'}}>{answeredCount}/{questions.length}</div>
+      <div className="bg-white shadow-md border-b-4 border-[#F59E0B]">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#F59E0B] rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-white" />
               </div>
-              
-              <div className="text-center px-6 py-3 bg-yellow-50 rounded-xl border-3" style={{borderColor: timeLeft < 300 ? '#EF4444' : '#F59E0B'}}>
-                <Clock className="inline w-5 h-5 mb-1" style={{color: timeLeft < 300 ? '#DC2626' : '#F59E0B'}} />
-                <div className="text-3xl font-extrabold" style={{color: timeLeft < 300 ? '#DC2626' : '#92400E', fontFamily: 'monospace'}}>
-                  {formatTime(timeLeft)}
-                </div>
-                <div className="text-xs" style={{color: '#78350F'}}>Time Remaining</div>
+              <div>
+                <h1 className="text-lg md:text-xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{exam.title}</h1>
+                <p className="text-xs md:text-sm text-[#6B7280]">Question {currentQuestionIndex + 1} of {questions.length}</p>
               </div>
             </div>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="mt-4">
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="h-2 rounded-full bg-gradient-to-r from-yellow-400 to-green-500" style={{width: `${progress}%`}}></div>
+            <div className="flex items-center gap-4">
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold ${timeLeft < 300 ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+                <Clock className="w-5 h-5" />
+                <span className="text-lg">{formatTime(timeLeft)}</span>
+              </div>
+              <button
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50"
+              >
+                {submitting ? 'Submitting...' : 'Submit'}
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Question Area */}
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-white rounded-3xl shadow-xl p-8 border-3 mb-6" style={{borderColor: '#FCD34D'}}>
-          {/* Question Number & Flag */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center font-extrabold text-xl" style={{color: '#92400E'}}>
-                {currentQuestion.question_number}
-              </div>
-              <span className="text-sm font-semibold text-gray-600 capitalize">
-                {currentQuestion.skill_area.replace(/_/g, ' ')}
-              </span>
-            </div>
+      {/* Progress Bar */}
+      <div className="bg-gray-200 h-2">
+        <div 
+          className="bg-[#F59E0B] h-2 transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        ></div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto p-4 md:p-6">
+        <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-6 border-2 border-[#E5E7EB]">
+          {/* Question */}
+          <div className="flex justify-between items-start mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-[#1F2937] flex-1" style={{fontFamily: 'Manrope, sans-serif'}}>
+              {currentQuestion.question_text}
+            </h2>
             <button
               onClick={() => toggleFlag(currentQuestion.id)}
-              className={`px-4 py-2 rounded-xl font-semibold transition-all ${flagged.has(currentQuestion.id) ? 'bg-red-100 text-red-700 border-2 border-red-300' : 'bg-gray-100 text-gray-600 border-2 border-gray-300'}`}
+              className={`ml-4 p-2 rounded-lg transition-colors ${
+                flagged.has(currentQuestion.id) 
+                  ? 'bg-red-100 text-red-600' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
             >
-              <Flag className="inline w-4 h-4 mr-1" />
-              {flagged.has(currentQuestion.id) ? 'Flagged' : 'Flag for Review'}
+              <Flag className="w-5 h-5" fill={flagged.has(currentQuestion.id) ? 'currentColor' : 'none'} />
             </button>
           </div>
 
-          {/* Question Text */}
-          <div className="mb-8">
-            <p className="text-2xl font-bold leading-relaxed" style={{color: '#1F2937'}}>
-              {currentQuestion.question_text}
-            </p>
-          </div>
-
           {/* Options */}
-          <div className="space-y-4">
-            {currentQuestion.options.map((option, index) => {
-              const isSelected = answers[currentQuestion.id] === option.option_id;
-              const letter = String.fromCharCode(65 + index); // A, B, C, D, E
+          <div className="space-y-3">
+            {['A', 'B', 'C', 'D', 'E'].map((option) => {
+              const optionText = currentQuestion[`option_${option.toLowerCase()}`];
+              if (!optionText) return null;
+              
+              const isSelected = answers[currentQuestion.id] === option;
               
               return (
                 <button
-                  key={option.option_id}
-                  onClick={() => handleAnswer(currentQuestion.id, option.option_id)}
-                  className={`w-full p-5 rounded-2xl border-3 text-left transition-all hover:scale-102 ${
-                    isSelected 
-                      ? 'bg-yellow-50 border-yellow-500 shadow-lg' 
-                      : 'bg-white border-gray-300 hover:border-yellow-400'
+                  key={option}
+                  onClick={() => handleAnswerSelect(currentQuestion.id, option)}
+                  className={`w-full p-4 text-left rounded-lg border-2 transition-all ${
+                    isSelected
+                      ? 'border-[#F59E0B] bg-[#FFF7E5] font-semibold'
+                      : 'border-[#E5E7EB] hover:border-[#F59E0B] hover:bg-[#FFFBF0]'
                   }`}
-                  style={{fontFamily: 'Inter, sans-serif'}}
+                  style={{fontFamily: 'Figtree, sans-serif'}}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-lg ${
-                      isSelected ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {letter}
-                    </div>
-                    <span className={`text-lg font-medium ${isSelected ? 'text-gray-900 font-semibold' : 'text-gray-700'}`}>
-                      {option.text}
-                    </span>
-                  </div>
+                  <span className="font-bold text-[#F59E0B] mr-3">{option}.</span>
+                  <span className="text-[#1F2937]">{optionText}</span>
                 </button>
               );
             })}
@@ -340,65 +294,30 @@ const ExamInterface = () => {
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-between items-center gap-4">
+        <div className="flex justify-between items-center">
           <button
-            onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
+            onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
             disabled={currentQuestionIndex === 0}
-            className="px-8 py-4 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            ← Previous
+            <ArrowLeft className="w-5 h-5" />
+            Previous
           </button>
-
+          
           <div className="text-center">
-            <p className="text-sm text-gray-600 mb-2">Jump to Question:</p>
-            <div className="flex gap-2 flex-wrap justify-center">
-              {questions.slice(0, 10).map((q, idx) => {
-                const isAnswered = !!answers[q.id];
-                const isCurrent = idx === currentQuestionIndex;
-                const isFlagged = flagged.has(q.id);
-                
-                return (
-                  <button
-                    key={q.id}
-                    onClick={() => setCurrentQuestionIndex(idx)}
-                    className={`w-10 h-10 rounded-lg font-bold text-sm ${
-                      isCurrent ? 'bg-yellow-500 text-white' :
-                      isFlagged ? 'bg-red-100 text-red-700 border-2 border-red-300' :
-                      isAnswered ? 'bg-green-100 text-green-700' :
-                      'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {idx + 1}
-                  </button>
-                );
-              })}
-              {questions.length > 10 && <span className="text-gray-500">...</span>}
-            </div>
+            <p className="text-sm text-[#6B7280] font-semibold">
+              Answered: {answeredCount} / {questions.length}
+            </p>
           </div>
-
+          
           <button
-            onClick={() => setCurrentQuestionIndex(Math.min(questions.length - 1, currentQuestionIndex + 1))}
+            onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
             disabled={currentQuestionIndex === questions.length - 1}
-            className="px-8 py-4 bg-yellow-500 text-white font-bold rounded-xl hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-3 bg-[#F59E0B] text-white font-semibold rounded-lg hover:bg-[#D97706] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Next →
+            Next
+            <ArrowRight className="w-5 h-5" />
           </button>
-        </div>
-
-        {/* Submit Button */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={handleSubmit}
-            disabled={submitting}
-            className="px-16 py-5 bg-gradient-to-r from-green-500 to-green-600 text-white font-extrabold rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 disabled:opacity-50 text-xl"
-            style={{fontFamily: 'Nunito'}}
-          >
-            {submitting ? 'Submitting...' : 'Submit Exam ✓'}
-          </button>
-          <p className="text-sm text-gray-600 mt-3">
-            {answeredCount} of {questions.length} questions answered
-            {flagged.size > 0 && ` | ${flagged.size} flagged for review`}
-          </p>
         </div>
       </div>
     </div>

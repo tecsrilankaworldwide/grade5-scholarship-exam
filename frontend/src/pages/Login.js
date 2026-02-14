@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import { BookOpen, Mail, Lock, User, Award } from 'lucide-react';
+import { BookOpen, Mail, Lock, Award, Star } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,120 +18,167 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login failed. Please check your credentials.');
-    } finally {
+      setError(err.response?.data?.detail || 'Invalid credentials');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FFFBF0] bg-dotted-grid noise-soft">
-      {/* Decorative gradient band */}
-      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#FFF7E5] via-[#FFF1CC] to-transparent opacity-60"></div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Vibrant gradient background with patterns */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FFF4E6] via-[#FFE5B4] to-[#FFF9E6]"></div>
+      <div className="absolute inset-0 bg-stars-soft opacity-40"></div>
+      <div className="absolute inset-0 bg-dotted-grid opacity-30"></div>
       
-      <div className="max-w-md w-full px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 relative z-10">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-[#F59E0B] to-[#D97706] rounded-3xl shadow-2xl flex items-center justify-center mx-auto mb-6 border-4 border-white ring-4 ring-[#F59E0B]/30">
-            <Award className="w-10 h-10 md:w-12 md:h-12 text-white" />
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-3 text-[#92400E] leading-tight" style={{fontFamily: 'Manrope, sans-serif', letterSpacing: '-0.02em'}}>
-            Examination Bureau
-          </h1>
-          <div className="h-1 w-24 bg-gradient-to-r from-[#F59E0B] to-[#FCD34D] mx-auto mb-4 rounded-full"></div>
-          <p className="text-xl md:text-2xl lg:text-3xl font-bold text-[#78350F] mb-2" style={{fontFamily: 'Manrope, sans-serif'}}>
-            Grade 5 Scholarship Exam Portal
-          </p>
-          <p className="text-sm md:text-base mt-3 text-[#92400E] font-semibold flex items-center justify-center gap-2" style={{fontFamily: 'Figtree, sans-serif'}}>
-            <span className="text-[#F59E0B]">★</span>
-            Excellence in Education Since 1982
-            <span className="text-[#F59E0B]">★</span>
-          </p>
-        </div>
-
-        {/* Login Card */}
-        <div className="bg-white/95 rounded-3xl shadow-2xl p-6 md:p-10 border-3 border-[#F5E6B3] backdrop-blur-sm">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-[#FFF7E5] to-[#FCD34D]/30 border-2 border-[#F59E0B]/20">
-              <BookOpen className="w-6 h-6 md:w-7 md:h-7 text-[#F59E0B]" />
+      {/* Decorative circles */}
+      <div className="absolute top-10 left-10 w-32 h-32 bg-[#FCD34D] rounded-full opacity-20 blur-3xl"></div>
+      <div className="absolute bottom-20 right-20 w-48 h-48 bg-[#F59E0B] rounded-full opacity-20 blur-3xl"></div>
+      <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-[#FCD34D] rounded-full opacity-10 blur-2xl"></div>
+      
+      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 py-12">
+        <div className="max-w-xl w-full">
+          {/* HUGE Header with dramatic styling */}
+          <div className="text-center mb-12">
+            {/* Big Logo */}
+            <div className="inline-block relative mb-8">
+              <div className="w-28 h-28 md:w-36 md:h-36 bg-gradient-to-br from-[#F59E0B] via-[#FB923C] to-[#F59E0B] rounded-3xl shadow-2xl flex items-center justify-center mx-auto border-8 border-white transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                <Award className="w-16 h-16 md:w-20 md:h-20 text-white" strokeWidth={3} />
+              </div>
+              <div className="absolute -top-2 -right-2 w-12 h-12 bg-[#FCD34D] rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                <Star className="w-6 h-6 text-[#92400E]" fill="#92400E" />
+              </div>
             </div>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>Sign In to Your Account</h2>
-          </div>
-
-          {error && (
-            <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-xl text-red-700 text-sm">
-              {error}
+            
+            {/* HUGE Main Title */}
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-none" style={{
+              fontFamily: 'Manrope, sans-serif',
+              letterSpacing: '-0.03em',
+              background: 'linear-gradient(135deg, #92400E 0%, #B45309 50%, #92400E 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              textShadow: '0 4px 8px rgba(0,0,0,0.1)'
+            }}>
+              Examination<br/>Bureau
+            </h1>
+            
+            {/* Decorative divider with stars */}
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <Star className="w-5 h-5 md:w-6 md:h-6 text-[#F59E0B]" fill="#F59E0B" />
+              <div className="h-1.5 w-20 md:w-32 bg-gradient-to-r from-transparent via-[#F59E0B] to-transparent rounded-full"></div>
+              <Star className="w-5 h-5 md:w-6 md:h-6 text-[#F59E0B]" fill="#F59E0B" />
             </div>
-          )}
-
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-base font-bold text-[#374151] mb-3 flex items-center gap-2" style={{fontFamily: 'Figtree, sans-serif'}}>
-                <Mail className="w-5 h-5 text-[#F59E0B]" />
-                Parent/Guardian Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-5 py-4 border-3 border-[#F5E6B3] rounded-xl focus:outline-none focus:ring-4 focus:ring-[#F59E0B]/30 focus:border-[#F59E0B] transition-all text-base bg-white hover:border-[#F59E0B]/50"
-                style={{fontSize: '16px', fontFamily: 'Figtree, sans-serif'}}
-                placeholder="parent@email.com"
-              />
-              <p className="text-xs md:text-sm mt-2 text-[#92400E] flex items-center gap-1">
-                <span className="text-[#F59E0B]">ℹ️</span>
-                Students should use their parent's email
+            
+            {/* Large Subtitle */}
+            <p className="text-2xl md:text-4xl lg:text-5xl font-extrabold text-[#78350F] mb-4" style={{fontFamily: 'Manrope, sans-serif'}}>
+              Grade 5 Scholarship Portal
+            </p>
+            
+            {/* Tagline */}
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border-3 border-[#FCD34D]">
+              <span className="text-xl md:text-2xl">🏆</span>
+              <p className="text-base md:text-xl font-bold text-[#92400E]" style={{fontFamily: 'Figtree, sans-serif'}}>
+                Building Future Scholars
               </p>
+              <span className="text-xl md:text-2xl">🏆</span>
+            </div>
+          </div>
+
+          {/* Login Card with dramatic styling */}
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border-4 border-[#F59E0B] transform hover:scale-[1.02] transition-transform duration-300">
+            {/* Card Header */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[#FFF7E5] to-[#FED7AA] rounded-2xl border-3 border-[#F59E0B] mb-4">
+                <BookOpen className="w-7 h-7 text-[#F59E0B]" />
+                <h2 className="text-3xl md:text-4xl font-black text-[#92400E]" style={{fontFamily: 'Manrope, sans-serif'}}>Sign In</h2>
+              </div>
+              <p className="text-lg md:text-xl text-[#78350F] font-semibold">Welcome back to your learning portal!</p>
             </div>
 
-            <div>
-              <label className="block text-base font-bold text-[#374151] mb-3 flex items-center gap-2" style={{fontFamily: 'Figtree, sans-serif'}}>
-                <Lock className="w-5 h-5 text-[#F59E0B]" />
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-5 py-4 border-3 border-[#F5E6B3] rounded-xl focus:outline-none focus:ring-4 focus:ring-[#F59E0B]/30 focus:border-[#F59E0B] transition-all text-base bg-white hover:border-[#F59E0B]/50"
-                style={{fontSize: '16px', fontFamily: 'Figtree, sans-serif'}}
-                placeholder="Enter password"
-              />
+            {error && (
+              <div className="mb-6 p-5 bg-red-50 border-4 border-red-300 rounded-2xl text-red-700 text-base font-semibold flex items-center gap-3">
+                <span className="text-2xl">⚠️</span>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-7">
+              <div>
+                <label className="flex items-center gap-3 text-lg md:text-xl font-bold text-[#374151] mb-4" style={{fontFamily: 'Figtree, sans-serif'}}>
+                  <div className="w-10 h-10 bg-[#FFF7E5] rounded-xl flex items-center justify-center border-2 border-[#F59E0B]">
+                    <Mail className="w-5 h-5 text-[#F59E0B]" />
+                  </div>
+                  Parent/Guardian Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full px-6 py-5 border-4 border-[#F5E6B3] rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#F59E0B] focus:border-[#F59E0B] transition-all text-lg bg-white hover:border-[#F59E0B] font-medium"
+                  style={{fontSize: '18px', fontFamily: 'Figtree, sans-serif'}}
+                  placeholder="parent@email.com"
+                />
+                <p className="text-sm md:text-base mt-3 text-[#92400E] flex items-center gap-2 font-medium">
+                  <span className="text-xl">ℹ️</span>
+                  Students should use their parent's email
+                </p>
+              </div>
+
+              <div>
+                <label className="flex items-center gap-3 text-lg md:text-xl font-bold text-[#374151] mb-4" style={{fontFamily: 'Figtree, sans-serif'}}>
+                  <div className="w-10 h-10 bg-[#FFF7E5] rounded-xl flex items-center justify-center border-2 border-[#F59E0B]">
+                    <Lock className="w-5 h-5 text-[#F59E0B]" />
+                  </div>
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-6 py-5 border-4 border-[#F5E6B3] rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#F59E0B] focus:border-[#F59E0B] transition-all text-lg bg-white hover:border-[#F59E0B] font-medium"
+                  style={{fontSize: '18px', fontFamily: 'Figtree, sans-serif'}}
+                  placeholder="Enter your password"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-6 md:py-7 text-white text-xl md:text-2xl font-black rounded-2xl shadow-2xl hover:shadow-3xl transition-all disabled:opacity-50 bg-gradient-to-r from-[#F59E0B] via-[#FB923C] to-[#F59E0B] hover:from-[#D97706] hover:to-[#EA580C] transform hover:scale-[1.02] active:scale-[0.98] border-4 border-white"
+                style={{fontFamily: 'Manrope, sans-serif', letterSpacing: '0.02em'}}
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-4">
+                    <div className="spinner-small"></div>
+                    <span>Signing You In...</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-3">
+                    <span className="text-3xl">🚀</span>
+                    <span>Sign In to Portal</span>
+                    <span className="text-3xl">→</span>
+                  </span>
+                )}
+              </button>
+            </form>
+
+            {/* Footer */}
+            <div className="mt-8 pt-6 border-t-3 border-[#F5E6B3] text-center">
+              <p className="text-base md:text-lg text-[#78350F] font-semibold mb-2">Need help?</p>
+              <p className="text-sm md:text-base text-[#92400E]">Contact your administrator</p>
             </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 md:py-5 text-white text-lg md:text-xl font-extrabold rounded-xl shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 bg-gradient-to-r from-[#F59E0B] via-[#F59E0B] to-[#D97706] hover:from-[#D97706] hover:to-[#B45309] transform hover:scale-[1.02] active:scale-[0.98]"
-              style={{fontFamily: 'Manrope, sans-serif', letterSpacing: '0.01em'}}
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-3">
-                  <div className="spinner-small"></div>
-                  Signing In...
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-2">
-                  Sign In to Portal
-                  <span className="text-2xl">→</span>
-                </span>
-              )}
-            </button>
-          </form>
-
-          <p className="text-center text-sm text-gray-600 mt-6">
-            Need help? Contact your administrator
-          </p>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-8 text-yellow-800">
-          <p className="text-sm font-semibold">Examination Evaluation Bureau (Pvt.) Ltd</p>
-          <p className="text-xs mt-1">Building Future Scholars</p>
+          </div>
+          
+          {/* Bottom branding */}
+          <div className="text-center mt-8">
+            <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/60 backdrop-blur-sm rounded-full shadow-lg">
+              <span className="text-lg">🏫</span>
+              <p className="text-sm md:text-base font-bold text-[#92400E]">Excellence in Education Since 1982</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

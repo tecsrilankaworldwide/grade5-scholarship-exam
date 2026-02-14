@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { BookOpen, Mail, Lock } from 'lucide-react';
-import ExamBureauLogo from '../components/ExamBureauLogo';
+import EducationReformsLogo from '../components/EducationReformsLogo';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -41,12 +41,12 @@ const Login = () => {
         <div className="max-w-2xl w-full">
           {/* HUGE Custom Logo Header */}
           <div className="mb-12">
-            <ExamBureauLogo size="large" />
+            <EducationReformsLogo size="large" />
           </div>
 
           {/* Subtitle */}
           <div className="text-center mb-10">
-            <p className="text-2xl md:text-3xl font-extrabold text-[#78350F] mb-2" style={{fontFamily: 'Manrope, sans-serif'}}>
+            <p className="text-2xl md:text-3xl font-extrabold text-[#78350F] mb-4" style={{fontFamily: 'Manrope, sans-serif'}}>
               Grade 5 Scholarship Exam Portal
             </p>
             <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/70 backdrop-blur-sm rounded-full shadow-md border-2 border-[#FCD34D]">

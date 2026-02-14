@@ -19,6 +19,8 @@ const Login = () => {
 
     try {
       await login(email, password);
+      // Navigate to dashboard after successful login
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.detail || 'Invalid credentials');
       setLoading(false);

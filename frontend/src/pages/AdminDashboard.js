@@ -309,6 +309,9 @@ const AdminDashboard = () => {
                     className="w-full px-4 py-3 border-2 border-[#E5E7EB] rounded-lg"
                     data-testid="new-user-grade-select"
                   >
+                    <option value="grade_2">{t('common.grade2')}</option>
+                    <option value="grade_3">{t('common.grade3')}</option>
+                    <option value="grade_4">{t('common.grade4')}</option>
                     <option value="grade_5">{t('common.grade5')}</option>
                   </select>
                 </div>

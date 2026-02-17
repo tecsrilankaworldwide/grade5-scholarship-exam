@@ -12,6 +12,7 @@ import StudentDashboard from './pages/StudentDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import ParentDashboard from './pages/ParentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import TypesetterDashboard from './pages/TypesetterDashboard';
 import ExamInterface from './pages/ExamInterface';
 import ProgressReport from './pages/ProgressReport';
 
@@ -47,6 +48,7 @@ function AppContent() {
               {user?.role === 'student' && <StudentDashboard />}
               {user?.role === 'parent' && <ParentDashboard />}
               {user?.role === 'teacher' && <TeacherDashboard />}
+              {user?.role === 'typesetter' && <TypesetterDashboard />}
               {user?.role === 'admin' && <AdminDashboard />}
             </ProtectedRoute>
           } 

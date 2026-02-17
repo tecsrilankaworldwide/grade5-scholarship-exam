@@ -98,6 +98,7 @@ class UserRole(str, Enum):
     STUDENT = "student"
     PARENT = "parent"
     TEACHER = "teacher"
+    TYPESETTER = "typesetter"  # New role for paper makers
     ADMIN = "admin"
 
 class Grade(str, Enum):
@@ -123,6 +124,11 @@ class ExamStatus(str, Enum):
     PUBLISHED = "published"
     CLOSED = "closed"
 
+class Language(str, Enum):
+    ENGLISH = "en"
+    SINHALA = "si"
+    TAMIL = "ta"
+
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     email: str
@@ -131,6 +137,8 @@ class User(BaseModel):
     hashed_password: Optional[str] = None  # Optional for response models
     grade: Optional[Grade] = None  # For students
     parent_id: Optional[str] = None  # Link student to parent
+    assigned_language: Optional[Language] = None  # For typesetters
+    assigned_grades: Optional[List[Grade]] = None  # For typesetters
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_active: bool = True
 
@@ -169,9 +177,16 @@ class Exam(BaseModel):
     title: str
     grade: Grade
     month: str  # e.g., "2024-01" for January 2024
-    paper1_questions: List[MCQQuestion] = []  # 60 questions
+    paper1_questions: List[MCQQuestion] = []  # 60 questions (old format - kept for backward compatibility)
     paper2_essay_prompt: str = ""  # 1 essay question
     paper2_short_questions: List[str] = []  # 10 short answer prompts
+    
+    # NEW: PDF-based exam support
+    exam_format: str = "mcq"  # "mcq" or "pdf"
+    pdf_path_en: Optional[str] = None  # English PDF file path
+    pdf_path_si: Optional[str] = None  # Sinhala PDF file path
+    pdf_path_ta: Optional[str] = None  # Tamil PDF file path
+    
     duration_minutes: int = 60  # Paper 1 duration
     total_marks_paper1: int = 60
     total_marks_paper2: int = 40  # Essay 20 + Short answers 20
@@ -179,6 +194,7 @@ class Exam(BaseModel):
     created_by: str  # Teacher ID
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     published_at: Optional[datetime] = None
+    is_active: bool = True
 
 class ExamAttempt(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -205,6 +221,20 @@ class Paper2Submission(BaseModel):
     teacher_comments: Optional[str] = None
     marked_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# NEW: PDF Exam Models
+class ExamCreatePDF(BaseModel):
+    title: str
+    grade: Grade
+    month: str
+    duration_minutes: int = 60
+    total_marks_paper1: int = 60
+
+class PDFUploadResponse(BaseModel):
+    message: str
+    exam_id: str
+    language: Language
+    pdf_path: str
 
 # ============================================================================
 # AUTH HELPERS
@@ -675,6 +705,119 @@ async def get_student_progress(student_id: str, current_user: User = Depends(get
         "weaknesses": weaknesses,
         "total_exams_taken": len(attempts)
     }
+
+# ============================================================================
+# PDF EXAM ENDPOINTS (NEW)
+# ============================================================================
+
+@app.post("/api/exams/create-pdf")
+async def create_pdf_exam(
+    exam_data: ExamCreatePDF,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new PDF-based exam (Typesetter only)"""
+    if current_user.role not in [UserRole.TYPESETTER, UserRole.ADMIN]:
+        raise HTTPException(status_code=403, detail="Only typesetters and admins can create PDF exams")
+    
+    exam_id = str(uuid.uuid4())
+    exam_doc = {
+        "id": exam_id,
+        "title": exam_data.title,
+        "grade": exam_data.grade.value,
+        "month": exam_data.month,
+        "exam_format": "pdf",
+        "pdf_path_en": None,
+        "pdf_path_si": None,
+        "pdf_path_ta": None,
+        "duration_minutes": exam_data.duration_minutes,
+        "total_marks_paper1": exam_data.total_marks_paper1,
+        "total_marks_paper2": 0,
+        "status": "draft",
+        "created_by": current_user.id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "is_active": True
+    }
+    
+    await db.exams.insert_one(exam_doc)
+    invalidate_exam_cache()
+    
+    return {
+        "message": "PDF exam created successfully",
+        "exam_id": exam_id,
+        "title": exam_data.title
+    }
+
+@app.post("/api/exams/{exam_id}/upload-pdf/{language}")
+async def upload_exam_pdf(
+    exam_id: str,
+    language: Language,
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload PDF for a specific language version of an exam"""
+    if current_user.role not in [UserRole.TYPESETTER, UserRole.ADMIN]:
+        raise HTTPException(status_code=403, detail="Only typesetters and admins can upload PDFs")
+    
+    # Check if exam exists
+    exam = await db.exams.find_one({"id": exam_id})
+    if not exam:
+        raise HTTPException(status_code=404, detail="Exam not found")
+    
+    # Validate file type
+    if not file.filename.endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+    
+    # Create upload directory if doesn't exist
+    upload_dir = "/root/grade5-scholarship-exam/backend/uploads/exam_pdfs"
+    os.makedirs(upload_dir, exist_ok=True)
+    
+    # Generate unique filename
+    file_extension = file.filename.split('.')[-1]
+    unique_filename = f"{exam_id}_{language.value}_{uuid.uuid4().hex[:8]}.{file_extension}"
+    file_path = os.path.join(upload_dir, unique_filename)
+    
+    # Save file
+    try:
+        with open(file_path, "wb") as buffer:
+            content = await file.read()
+            buffer.write(content)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+    
+    # Update exam document with PDF path
+    pdf_field = f"pdf_path_{language.value}"
+    await db.exams.update_one(
+        {"id": exam_id},
+        {"$set": {pdf_field: file_path}}
+    )
+    invalidate_exam_cache()
+    
+    return PDFUploadResponse(
+        message=f"PDF uploaded successfully for {language.value}",
+        exam_id=exam_id,
+        language=language,
+        pdf_path=file_path
+    )
+
+@app.get("/api/exams/{exam_id}/pdf/{language}")
+async def get_exam_pdf(
+    exam_id: str,
+    language: Language,
+    current_user: User = Depends(get_current_user)
+):
+    """Get PDF file path for a specific language"""
+    exam = await db.exams.find_one({"id": exam_id}, {"_id": 0})
+    if not exam:
+        raise HTTPException(status_code=404, detail="Exam not found")
+    
+    pdf_field = f"pdf_path_{language.value}"
+    pdf_path = exam.get(pdf_field)
+    
+    if not pdf_path or not os.path.exists(pdf_path):
+        raise HTTPException(status_code=404, detail=f"PDF not available for {language.value}")
+    
+    from fastapi.responses import FileResponse
+    return FileResponse(pdf_path, media_type="application/pdf", filename=f"exam_{exam_id}_{language.value}.pdf")
 
 @app.get("/api/")
 async def root():

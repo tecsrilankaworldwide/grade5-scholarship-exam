@@ -5,6 +5,34 @@ const AuthContext = createContext();
 
 export const API = process.env.REACT_APP_BACKEND_URL ? `${process.env.REACT_APP_BACKEND_URL}/api` : '/api';
 
+// Add axios interceptor to automatically inject auth token
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('exam_token');
+    if (token && config.url.includes('/api/')) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for handling 401 errors
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid, logout
+      localStorage.removeItem('exam_token');
+      localStorage.removeItem('exam_user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('exam_token'));

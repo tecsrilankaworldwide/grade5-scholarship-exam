@@ -277,6 +277,33 @@ const ExamInterface = () => {
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
   const answeredCount = Object.keys(answers).length;
 
+  // Handle empty exam case
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6] p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 max-w-md text-center border-2 border-[#EF4444]">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-10 h-10 text-red-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-[#1F2937] mb-4" style={{fontFamily: 'Manrope, sans-serif'}}>
+            Exam Not Available
+          </h2>
+          <p className="text-gray-600 mb-6">
+            This exam does not have any questions yet. Please contact your teacher or try a different exam.
+          </p>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="w-full py-3 bg-[#F59E0B] text-white font-bold rounded-lg hover:bg-[#D97706] transition-all"
+            style={{fontFamily: 'Manrope, sans-serif'}}
+            data-testid="back-to-dashboard-btn"
+          >
+            {t('common.backToDashboard')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!currentQuestion) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6]">

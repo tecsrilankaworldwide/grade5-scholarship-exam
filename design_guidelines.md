@@ -2,7 +2,7 @@
   "brand": {
     "name": "Examination Evaluation Bureau – Grade 5 Scholarship Platform",
     "attributes": ["official", "trustworthy", "calm focus", "parent-friendly", "teacher-efficient"],
-    "tone": "Warm academic with amber/gold accents and light parchment surfaces. Professional, government-grade clarity."
+    "tone": "Warm academic with amber/gold accents and light parchment surfaces. Professional, bureau-grade clarity."
   },
   "typography": {
     "families": {
@@ -18,9 +18,9 @@
     },
     "scale": {
       "h1": "text-4xl sm:text-5xl lg:text-6xl leading-tight tracking-tight",
-      "h2": "text-xl md:text-2xl font-semibold tracking-tight",
+      "h2": "text-base md:text-lg font-semibold tracking-tight",
       "h3": "text-lg md:text-xl font-semibold",
-      "body": "text-base md:text-[17px] leading-7",
+      "body": "text-base sm:text-sm md:text-base leading-7",
       "small": "text-sm leading-6",
       "code": "text-sm font-mono"
     }
@@ -91,10 +91,10 @@
   },
   "css_audit_and_fixes": {
     "issues_found": [
-      "App.css overrides fonts to Inter/Nunito; conflicts with product fonts (Manrope/Figtree).",
-      "Universal transitions used (transition: all) on buttons and card-hover, violating best practice.",
-      "index.css @layer utilities has an unclosed .noise-soft block, causing nested rules to be invalid and possibly dropped.",
-      "Duplicate spinner styles defined in App.css and index.css; unify to one utility.",
+      "App.css overrides fonts to Inter/Nunito; conflicts with Manrope/Figtree.",
+      "Universal transitions used (transition: all) on buttons and .card-hover.",
+      "index.css @layer utilities has an unclosed .noise-soft block, breaking subsequent rules.",
+      "Duplicate spinner styles between App.css and index.css.",
       "Hard-coded body background in App.css conflicts with Tailwind tokens."
     ],
     "patches": [
@@ -135,10 +135,10 @@
       },
       {
         "file": "/app/frontend/src/index.css",
-        "description": "Close .noise-soft rule and keep spinner utilities valid. Also ensure one spinner variant only.",
+        "description": "Close .noise-soft and keep spinner utilities valid (single definition).",
         "replace": {
           "from": ".noise-soft {\n    background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"220\" height=\"220\"><filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.65\" numOctaves=\"2\" stitchTiles=\"stitch\"/></filter><rect width=\"100%\" height=\"100%\" filter=\"url(%23n)\" opacity=\"0.03\"/></svg>');\n\n  /* Spinner animations */\n  @keyframes spin {\n    to { transform: rotate(360deg); }\n  }\n\n  .spinner {\n    border: 4px solid rgba(246, 163, 23, 0.3);\n    border-top-color: #F6A317;\n    border-radius: 50%;\n    width: 40px;\n    height: 40px;\n    animation: spin 0.6s linear infinite;\n  }\n\n  .spinner-small {\n    border: 3px solid rgba(255, 255, 255, 0.3);\n    border-top-color: #ffffff;\n    border-radius: 50%;\n    width: 20px;\n    height: 20px;\n    animation: spin 0.6s linear infinite;\n    display: inline-block;\n  }\n\n  }",
-          "to": ".noise-soft {\n    background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"220\" height=\"220\"><filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.65\" numOctaves=\"2\" stitchTiles=\"stitch\"/></filter><rect width=\"100%\" height=\"100%\" filter=\"url(%23n)\" opacity=\"0.03\"/></svg>');\n}\n\n/* Spinner animations */\n@keyframes spin { to { transform: rotate(360deg); } }\n\n.spinner {\n  border: 4px solid rgba(246, 163, 23, 0.3);\n  border-top-color: #F6A317;\n  border-radius: 50%;\n  width: 40px;\n  height: 40px;\n  animation: spin 0.6s linear infinite;\n}"
+          "to": ".noise-soft {\n  background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"220\" height=\"220\"><filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.65\" numOctaves=\"2\" stitchTiles=\"stitch\"/></filter><rect width=\"100%\" height=\"100%\" filter=\"url(%23n)\" opacity=\"0.03\"/></svg>');\n}\n\n/* Spinner animations */\n@keyframes spin { to { transform: rotate(360deg); } }\n\n.spinner {\n  border: 4px solid rgba(246, 163, 23, 0.3);\n  border-top-color: #F6A317;\n  border-radius: 50%;\n  width: 40px;\n  height: 40px;\n  animation: spin 0.6s linear infinite;\n}"
         }
       },
       {
@@ -164,11 +164,7 @@
       "principles": ["Plain-language labels, large legends, clear tooltips, summary first then detail."],
       "chart_styles": {
         "container": "bg-card rounded-xl p-5 elev-1",
-        "line_chart_props": {
-          "strokeWidth": 3,
-          "dotRadius": 3,
-          "activeDot": { "r": 5 }
-        },
+        "line_chart_props": {"strokeWidth": 3, "dotRadius": 3, "activeDot": {"r": 5}},
         "radar_opacity": 0.28
       },
       "recharts_snippet": "import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';\n\nconst colors = { line1: 'hsl(38 94% 54%)', line2: 'hsl(35 92% 51%)', grid: 'hsl(45 70% 80% / 0.42)', axis: 'hsl(215 19% 27%)' };\n\nexport function MonthlyProgress({ data }) {\n  return (\n    <div className=\"bg-card rounded-xl p-5 elev-1\" data-testid=\"monthly-progress-card\">\n      <h3 className=\"text-lg font-semibold mb-4\">Monthly Progress</h3>\n      <ResponsiveContainer width=\"100%\" height={280}>\n        <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>\n          <CartesianGrid stroke={colors.grid} vertical={false} />\n          <XAxis dataKey=\"month\" stroke={colors.axis} tick={{ fontSize: 12 }} />\n          <YAxis stroke={colors.axis} domain={[0, 100]} tick={{ fontSize: 12 }} />\n          <Tooltip contentStyle={{ background: '#fff', border: '1px solid #EEE' }} />\n          <Legend wrapperStyle={{ paddingTop: 8 }} />\n          <Line type=\"monotone\" dataKey=\"score\" stroke={colors.line1} strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 5 }} />\n        </LineChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n\nexport function SkillRadar({ data }) {\n  return (\n    <div className=\"bg-card rounded-xl p-5 elev-1\" data-testid=\"skill-radar-card\">\n      <h3 className=\"text-lg font-semibold mb-4\">Skill Profile</h3>\n      <ResponsiveContainer width=\"100%\" height={320}>\n        <RadarChart cx=\"50%\" cy=\"50%\" outerRadius=\"80%\" data={data}>\n          <PolarGrid stroke=\"hsl(45 70% 80% / 0.42)\" />\n          <PolarAngleAxis dataKey=\"skill\" tick={{ fontSize: 12, fill: 'hsl(215 19% 27%)' }} />\n          <PolarRadiusAxis angle={30} domain={[0, 100]} />\n          <Radar name=\"Score\" dataKey=\"value\" stroke=\"hsl(35 92% 51%)\" fill=\"hsl(35 92% 51%)\" fillOpacity={0.28} />\n        </RadarChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}"
@@ -196,7 +192,8 @@
     "usage_notes": [
       "Always import from existing shadcn/ui .jsx components. Do not use native HTML dropdowns/menus.",
       "Include data-testid on all interactive and key informational elements.",
-      "Use Button variants defined by tokens above (primary, secondary, ghost)."
+      "Use Button variants defined by tokens above (primary, secondary, ghost).",
+      "If date selection is needed, use shadcn calendar from ./components/ui/calendar"
     ],
     "micro_interactions": {
       "button": "hover:translate-y-[-1px] active:translate-y-0 focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]",
@@ -206,8 +203,11 @@
   },
   "accessibility_and_testing": {
     "wcag": "AA contrast minimum. Use text-[hsl(var(--brand-ink))] on light surfaces.",
-    "keyboard": ["All focusable elements must have visible focus ring using --ring.", "Ensure Skip to content in exam pages is hidden during exam but available before starting."],
-    "i18n": "Language switch via DropdownMenu with Sr-only current language label.",
+    "keyboard": [
+      "All focusable elements must have visible focus ring using --ring.",
+      "Ensure Skip to content in exam pages is hidden during exam but available before starting."
+    ],
+    "i18n": "Language switch via DropdownMenu with sr-only current language label.",
     "data_testid_convention": {
       "rule": "kebab-case focusing on role (not appearance)",
       "examples": [
@@ -232,7 +232,7 @@
         "ResponsiveContainer": true,
         "CartesianGrid.stroke": "hsl(45 70% 80% / 0.42)",
         "Axis.stroke": "hsl(215 19% 27%)",
-        "Tooltip.contentStyle": { "background": "#fff", "border": "1px solid #EEE", "borderRadius": "10px" }
+        "Tooltip.contentStyle": {"background": "#fff", "border": "1px solid #EEE", "borderRadius": "10px"}
       },
       "empty_states": {
         "pattern": "Use shadcn/skeleton + a short helper copy, keep height consistent.",
@@ -243,23 +243,16 @@
   "images_and_illustration": {
     "style": "Real classroom textures and sunlight shots; avoid cartoonish imagery. Low-saturation warm tones.",
     "image_urls": [
-      {
-        "url": "https://images.unsplash.com/photo-1637777292536-27a13272dbea?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "description": "Warm sunlight on a wooden desk (minimal academic mood)",
-        "category": "hero-strip/headers"
-      },
-      {
-        "url": "https://images.unsplash.com/photo-1582202602267-840d332d9530?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "description": "Laptop on classroom desk by window – for parent/teacher dashboards",
-        "category": "dashboard empty/intro"
-      },
-      {
-        "url": "https://images.pexels.com/photos/256395/pexels-photo-256395.jpeg",
-        "description": "Apple and stationery on notebook – use in marketing/about",
-        "category": "marketing/about section"
-      }
+      {"url": "https://images.unsplash.com/photo-1637777292536-27a13272dbea?crop=entropy&cs=srgb&fm=jpg&q=85", "description": "Warm sunlight on a wooden desk (minimal academic mood)", "category": "hero-strip/headers"},
+      {"url": "https://images.unsplash.com/photo-1582202602267-840d332d9530?crop=entropy&cs=srgb&fm=jpg&q=85", "description": "Laptop on classroom desk by window – for parent/teacher dashboards", "category": "dashboard empty/intro"},
+      {"url": "https://images.pexels.com/photos/256395/pexels-photo-256395.jpeg", "description": "Apple and stationery on notebook – use in marketing/about", "category": "marketing/about section"}
     ]
   },
+  "image_urls": [
+    {"url": "https://images.unsplash.com/photo-1637777292536-27a13272dbea?crop=entropy&cs=srgb&fm=jpg&q=85", "description": "Warm sunlight on a wooden desk (minimal academic mood)", "category": "hero-strip/headers"},
+    {"url": "https://images.unsplash.com/photo-1582202602267-840d332d9530?crop=entropy&cs=srgb&fm=jpg&q=85", "description": "Laptop on classroom desk by window – for parent/teacher dashboards", "category": "dashboard empty/intro"},
+    {"url": "https://images.pexels.com/photos/256395/pexels-photo-256395.jpeg", "description": "Apple and stationery on notebook – use in marketing/about", "category": "marketing/about section"}
+  ],
   "grids_and_spacing": {
     "container": "mx-auto max-w-6xl px-4 sm:px-6 lg:px-8",
     "grid_patterns": [
@@ -270,12 +263,7 @@
     "spacing": "Use 2–3x comfortable spacing. Section padding: py-10 md:py-16; Card padding: p-5 md:p-7"
   },
   "motion": {
-    "library": {
-      "optional": true,
-      "name": "framer-motion",
-      "install": "npm i framer-motion",
-      "usage": "Use for subtle entrance animations only (staggered cards, fade-up). Do not animate large reading blocks."
-    },
+    "library": {"optional": true, "name": "framer-motion", "install": "npm i framer-motion", "usage": "Use for subtle entrance animations only (staggered cards, fade-up). Do not animate large reading blocks."},
     "principles": [
       "No universal transitions (avoid transition: all).",
       "Entrance: fade/translate-y-8 with 200–300ms and 40ms stagger.",
@@ -291,15 +279,18 @@
     ],
     "teacher": [
       "Use Tabs for creation/marking/published; keep consistent card padding and table density.",
-      "Use Dialog for publish confirmation with explicit consequences copy."] ,
+      "Use Dialog for publish confirmation with explicit consequences copy."
+    ],
     "parent": [
       "Show 2–3 KPI cards (avg score, attendance, last exam) before charts.",
       "Charts: strong legends and explicit units (%)."
     ],
     "admin": [
-      "Tables with sticky header, row hover bg-[hsl(var(--brand-surface-2))], and visible sort icons."] ,
+      "Tables with sticky header, row hover bg-[hsl(var(--brand-surface-2))], and visible sort icons."
+    ],
     "typesetter": [
-      "Upload area: dashed border, subtle noise background, show language tags as Badge components."]
+      "Upload area: dashed border, subtle noise background, show language tags as Badge components."
+    ]
   },
   "non_functional_requirements": {
     "performance": "Defer decorative images; use loading='lazy'.",
@@ -318,7 +309,13 @@
   ],
   "component_path": {
     "primary_source": "./components/ui/*",
-    "notes": "All shadcn components are present as .jsx. Keep named exports for components and default exports for pages (functions in .js)."
+    "notes": "All shadcn components are .jsx. Keep named exports for components and default exports for pages (.js). Use ./components/ui/sonner for toasts."
   },
-  "general_guidelines_appendix": "- You must **not** apply universal transition. Eg: `transition: all`. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms\n    - You must **not** center align the app container, ie do not add `.App { text-align: center; }` in the css file. This disrupts the human natural reading flow of text\n   - NEVER: use AI assistant Emoji characters like`🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons. Always use **FontAwesome cdn** or **lucid-react** library already installed in the package.json\n\n **GRADIENT RESTRICTION RULE**\nNEVER use dark/saturated gradient combos (e.g., purple/pink) on any UI element.  Prohibited gradients: blue-500 to purple 600, purple 500 to pink-500, green-500 to blue-500, red to pink etc\nNEVER use dark gradients for logo, testimonial, footer etc\nNEVER let gradients cover more than 20% of the viewport.\nNEVER apply gradients to text-heavy content or reading areas.\nNEVER use gradients on small UI elements (<100px width).\nNEVER stack multiple gradient layers in the same viewport.\n\n**ENFORCEMENT RULE:**\n    • Id gradient area exceeds 20% of viewport OR affects readability, **THEN** use solid colors\n\n**How and where to use:**\n   • Section backgrounds (not content backgrounds)\n   • Hero section header content. Eg: dark to light to dark color\n   • Decorative overlays and accent elements only\n   • Hero section with 2-3 mild color\n   • Gradients creation can be done for any angle say horizontal, vertical or diagonal\n\n- For AI chat, voice application, **do not use purple color. Use color like light green, ocean blue, peach orange etc**\n\n</Font Guidelines>\n\n- Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead. \n   \n- Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.\n\n- Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.\n   \n- Before generating UI, infer the visual style from the problem statement (palette, contrast, mood, motion) and immediately instantiate it by setting global design tokens (primary, secondary/accent, background, foreground, ring, state colors), rather than relying on any library defaults. Don't make the background dark as a default step, always understand problem first and define colors accordingly\n    Eg: - if it implies playful/energetic, choose a colorful scheme\n           - if it implies monochrome/minimal, choose a black–white/neutral scheme\n\n**Component Reuse:**\n	- Prioritize using pre-existing components from src/components/ui when applicable\n	- Create new components that match the style and conventions of existing components when needed\n	- Examine existing components to understand the project's component patterns before creating new ones\n\n**IMPORTANT**: Do not use HTML based component like dropdown, calendar, toast etc. You **MUST** always use `/app/frontend/src/components/ui/ ` only as a primary components as these are modern and stylish component\n\n**Best Practices:**\n	- Use Shadcn/UI as the primary component library for consistency and accessibility\n	- Import path: ./components/[component-name]\n\n**Export Conventions:**\n	- Components MUST use named exports (export const ComponentName = ...)\n	- Pages MUST use default exports (export default function PageName() {...})\n\n**Toasts:**\n  - Use `sonner` for toasts\"\n  - Sonner component are located in `/app/src/components/ui/sonner.tsx`\n\nUse 2–4 color gradients, subtle textures/noise overlays, or CSS-based noise to avoid flat visuals."
+  "search_references": [
+    {"title": "Student exam portal UX case study", "url": "https://uxplanet.org/student-exam-portal-design-a-ux-case-study-486d9b9e2418"},
+    {"title": "eLearning interface design examples (minimal distraction)", "url": "https://www.eleken.co/blog-posts/elearning-interface-design-examples"},
+    {"title": "Dribbble exam UI inspiration", "url": "https://dribbble.com/search/exam-ui"},
+    {"title": "Recharts examples", "url": "https://recharts.org"}
+  ],
+  "general_ui_ux_design_guidelines_raw": "- You must **not** apply universal transition. Eg: `transition: all`. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms\n    - You must **not** center align the app container, ie do not add `.App { text-align: center; }` in the css file. This disrupts the human natural reading flow of text\n   - NEVER: use AI assistant Emoji characters like`🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons. Always use **FontAwesome cdn** or **lucid-react** library already installed in the package.json\n\n **GRADIENT RESTRICTION RULE**\nNEVER use dark/saturated gradient combos (e.g., purple/pink) on any UI element.  Prohibited gradients: blue-500 to purple 600, purple 500 to pink-500, green-500 to blue-500, red to pink etc\nNEVER use dark gradients for logo, testimonial, footer etc\nNEVER let gradients cover more than 20% of the viewport.\nNEVER apply gradients to text-heavy content or reading areas.\nNEVER use gradients on small UI elements (<100px width).\nNEVER stack multiple gradient layers in the same viewport.\n\n**ENFORCEMENT RULE:**\n    • Id gradient area exceeds 20% of viewport OR affects readability, **THEN** use solid colors\n\n**How and where to use:**\n   • Section backgrounds (not content backgrounds)\n   • Hero section header content. Eg: dark to light to dark color\n   • Decorative overlays and accent elements only\n   • Hero section with 2-3 mild color\n   • Gradients creation can be done for any angle say horizontal, vertical or diagonal\n\n- For AI chat, voice application, **do not use purple color. Use color like light green, ocean blue, peach orange etc**\n\n\n- Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead. \n   \n- Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.\n\n- Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.\n   \n- Before generating UI, infer the visual style from the problem statement (palette, contrast, mood, motion) and immediately instantiate it by setting global design tokens (primary, secondary/accent, background, foreground, ring, state colors), rather than relying on any library defaults. Don't make the background dark as a default step, always understand problem first and define colors accordingly\n    Eg: - if it implies playful/energetic, choose a colorful scheme\n           - if it implies monochrome/minimal, choose a black–white/neutral scheme\n\n**Component Reuse:**\n\t- Prioritize using pre-existing components from src/components/ui when applicable\n\t- Create new components that match the style and conventions of existing components when needed\n\t- Examine existing components to understand the project's component patterns before creating new ones\n\n**IMPORTANT**: Do not use HTML based component like dropdown, calendar, toast etc. You **MUST** always use `/app/frontend/src/components/ui/ ` only as a primary components as these are modern and stylish component\n\n**Best Practices:**\n\t- Use Shadcn/UI as the primary component library for consistency and accessibility\n\t- Import path: ./components/[component-name]\n\n**Export Conventions:**\n\t- Components MUST use named exports (export const ComponentName = ...)\n\t- Pages MUST use default exports (export default function PageName() {...})\n\n**Toasts:**\n  - Use `sonner` for toasts\"\n  - Sonner component are located in `/app/src/components/ui/sonner.tsx`\n\nUse 2–4 color gradients, subtle textures/noise overlays, or CSS-based noise to avoid flat visuals."
 }

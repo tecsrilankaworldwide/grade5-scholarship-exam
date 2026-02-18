@@ -276,6 +276,92 @@ class ExamPlatformTester:
             self.log_test("Role-based access control", False, str(e))
             return False
     
+    def test_paper2_submission(self, exam_id, student_id):
+        """Test Paper 2 submission metadata"""
+        try:
+            headers = {"Authorization": f"Bearer {self.tokens['student']}"}
+            submission_data = {
+                "exam_id": exam_id,
+                "student_id": student_id,
+                "whatsapp_reference": "Test submission via WhatsApp"
+            }
+            
+            response = requests.post(
+                f"{self.base_url}/paper2/submit-meta",
+                json=submission_data,
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test("Paper 2 submission metadata", True)
+                return data.get("id")
+            else:
+                self.log_test("Paper 2 submission metadata", False, f"Status {response.status_code}")
+                return None
+        except Exception as e:
+            self.log_test("Paper 2 submission metadata", False, str(e))
+            return None
+    
+    def test_paper2_marking(self, submission_id):
+        """Test Paper 2 marking by teacher"""
+        try:
+            headers = {"Authorization": f"Bearer {self.tokens['teacher']}"}
+            marks_data = {
+                "essay_marks": 15,
+                "short_answer_marks": [2, 2, 1, 2, 2, 1, 2, 2, 2, 1],
+                "comments": "Good effort, needs improvement in essay structure"
+            }
+            
+            response = requests.put(
+                f"{self.base_url}/paper2/{submission_id}/mark",
+                json=marks_data,
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test(f"Paper 2 marking (Total: {data.get('total_marks', 0)}/40)", True)
+                return True
+            else:
+                self.log_test("Paper 2 marking", False, f"Status {response.status_code}")
+                return False
+        except Exception as e:
+            self.log_test("Paper 2 marking", False, str(e))
+            return False
+    
+    def test_create_pdf_exam(self):
+        """Test creating PDF exam (admin can do this)"""
+        try:
+            headers = {"Authorization": f"Bearer {self.tokens['admin']}"}
+            exam_data = {
+                "title": "Test PDF Exam - March 2025",
+                "grade": "grade_5",
+                "month": "2025-03",
+                "duration_minutes": 60,
+                "total_marks_paper1": 60
+            }
+            
+            response = requests.post(
+                f"{self.base_url}/exams/create-pdf",
+                json=exam_data,
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test("Create PDF exam (admin)", True)
+                return data.get("exam_id")
+            else:
+                self.log_test("Create PDF exam (admin)", False, f"Status {response.status_code}")
+                return None
+        except Exception as e:
+            self.log_test("Create PDF exam (admin)", False, str(e))
+            return None
+    
     def test_api_root(self):
         """Test API root endpoint"""
         try:

@@ -450,6 +450,22 @@ class ExamPlatformTester:
         self.test_unauthorized_access()
         print()
         
+        # Test 7: Paper 2 workflow
+        if published_exams and self.users.get("student"):
+            print("📝 Testing Paper 2 Workflow...")
+            exam_id = published_exams[0]["id"]
+            student_id = self.users["student"]["id"]
+            
+            submission_id = self.test_paper2_submission(exam_id, student_id)
+            if submission_id:
+                self.test_paper2_marking(submission_id)
+            print()
+        
+        # Test 8: PDF Exam creation
+        print("📄 Testing PDF Exam Creation...")
+        self.test_create_pdf_exam()
+        print()
+        
         # Summary
         print("="*70)
         print(f"📊 TEST SUMMARY")

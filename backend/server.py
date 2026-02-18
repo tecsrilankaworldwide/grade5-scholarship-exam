@@ -514,9 +514,12 @@ async def submit_exam(
     skill_totals = {skill.value: 0 for skill in SkillArea}
     
     for question in exam["paper1_questions"]:
-        q_id = question["id"]
+        # Handle both old and new question formats
+        q_id = question.get("id") or str(question.get("question_number", ""))
         student_answer = attempt["answers"].get(q_id)
-        correct_answer = question["correct_option_id"]
+        
+        # Handle both correct_option_id (new) and correct_answer (old) formats
+        correct_answer = question.get("correct_option_id") or question.get("correct_answer")
         skill = question["skill_area"]
         marks = question.get("marks", 1)
         

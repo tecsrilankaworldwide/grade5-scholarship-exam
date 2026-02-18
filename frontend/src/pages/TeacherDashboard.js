@@ -31,6 +31,26 @@ const TeacherDashboard = () => {
   };
 
   const publishExam = async (examId) => {
+    const examToPublish = exams.find(e => e.id === examId);
+    if (!examToPublish) {
+      alert('Exam not found');
+      return;
+    }
+    
+    // Validate exam has questions
+    const questionCount = examToPublish.paper1_questions?.length || 0;
+    if (questionCount === 0) {
+      alert('Cannot publish exam with 0 questions. Please add questions first.');
+      return;
+    }
+    
+    if (questionCount < 60) {
+      const proceed = window.confirm(
+        `Warning: This exam only has ${questionCount}/60 questions. Do you want to publish it anyway?`
+      );
+      if (!proceed) return;
+    }
+    
     try {
       await axios.put(
         `${API}/exams/${examId}/publish`,

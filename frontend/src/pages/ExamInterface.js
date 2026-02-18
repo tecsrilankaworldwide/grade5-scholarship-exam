@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth, API } from '../AuthContext';
 import axios from 'axios';
-import { Clock, Flag, CheckCircle, AlertCircle, BookOpen, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Clock, Flag, CheckCircle, AlertCircle, BookOpen, ArrowLeft, ArrowRight, Save } from 'lucide-react';
+import dayjs from 'dayjs';
 
 const ExamInterface = () => {
+  const { t } = useTranslation();
   const { examId } = useParams();
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -18,26 +21,48 @@ const ExamInterface = () => {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
   const [flagged, setFlagged] = useState(new Set());
+  const [saving, setSaving] = useState(false);
+  const saveTimerRef = useRef(null);
 
   useEffect(() => {
     startOrResumeExam();
+    
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
   }, []);
 
   useEffect(() => {
-    if (!exam || result) return;
+    if (!exam || result || !attempt) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 1) {
+        const newTime = prev - 1;
+        localStorage.setItem(`exam_${examId}_time`, newTime);
+        
+        if (newTime <= 0) {
           handleSubmit();
           return 0;
         }
-        return prev - 1;
+        return newTime;
       });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [exam, result]);
+  }, [exam, result, attempt]);
+
+  // Auto-save answers every 10 seconds
+  useEffect(() => {
+    if (!attempt || result) return;
+    
+    saveTimerRef.current = setTimeout(() => {
+      saveCurrentAnswers();
+    }, 10000);
+    
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, [answers, attempt, result]);
 
   const startOrResumeExam = async () => {
     try {
@@ -46,30 +71,84 @@ const ExamInterface = () => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setExam(response.data.exam);
-      setAttempt(response.data.attempt);
-      setAnswers(response.data.attempt.answers || {});
-      setTimeLeft(response.data.time_left);
+      
+      const examData = response.data.exam;
+      const attemptData = response.data.attempt;
+      const isResume = response.data.resume;
+      
+      setExam(examData);
+      setAttempt(attemptData);
+      setAnswers(attemptData.answers || {});
+      
+      // Calculate time left
+      if (isResume && attemptData.started_at) {
+        const startTime = dayjs(attemptData.started_at);
+        const elapsed = dayjs().diff(startTime, 'second');
+        const totalTime = examData.duration_minutes * 60;
+        const remaining = Math.max(0, totalTime - elapsed);
+        setTimeLeft(remaining);
+        localStorage.setItem(`exam_${examId}_time`, remaining);
+      } else {
+        const totalTime = examData.duration_minutes * 60;
+        setTimeLeft(totalTime);
+        localStorage.setItem(`exam_${examId}_time`, totalTime);
+      }
+      
       setLoading(false);
     } catch (error) {
       console.error('Failed to start exam:', error);
-      alert('Failed to start exam: ' + (error.response?.data?.detail || error.message));
+      alert(t('common.error') + ': ' + (error.response?.data?.detail || error.message));
       navigate('/dashboard');
     }
   };
 
-  const handleAnswerSelect = (questionId, option) => {
-    setAnswers(prev => ({
-      ...prev,
+  const saveCurrentAnswers = async () => {
+    if (!attempt || Object.keys(answers).length === 0 || saving) return;
+    
+    setSaving(true);
+    try {
+      // Save each answer
+      for (const [questionId, selectedOption] of Object.entries(answers)) {
+        await axios.post(
+          `${API}/attempts/${attempt.id}/save`,
+          { question_id: questionId, selected_option: selectedOption },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+      localStorage.setItem(`exam_${examId}_answers`, JSON.stringify(answers));
+    } catch (error) {
+      console.error('Failed to auto-save:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAnswerSelect = async (questionId, option) => {
+    const newAnswers = {
+      ...answers,
       [questionId]: option
-    }));
+    };
+    setAnswers(newAnswers);
+    localStorage.setItem(`exam_${examId}_answers`, JSON.stringify(newAnswers));
+    
+    // Save immediately on answer selection
+    try {
+      await axios.post(
+        `${API}/attempts/${attempt.id}/save`,
+        { question_id: questionId, selected_option: option },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (error) {
+      console.error('Failed to save answer:', error);
+    }
   };
 
   const handleSubmit = async () => {
     if (submitting) return;
     
+    const questions = exam.paper1_questions || exam.questions || [];
     const confirmed = window.confirm(
-      `Are you sure you want to submit your exam?\n\nAnswered: ${Object.keys(answers).length}/${exam.questions.length}`
+      `${t('exam.submit')}?\n\n${t('exam.question')} ${t('exam.questions')}: ${Object.keys(answers).length}/${questions.length}`
     );
     
     if (!confirmed) return;
@@ -77,14 +156,16 @@ const ExamInterface = () => {
     setSubmitting(true);
     try {
       const response = await axios.post(
-        `${API}/exams/${examId}/submit`,
-        { answers },
+        `${API}/attempts/${attempt.id}/submit`,
+        {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setResult(response.data);
+      localStorage.removeItem(`exam_${examId}_time`);
+      localStorage.removeItem(`exam_${examId}_answers`);
     } catch (error) {
       console.error('Failed to submit exam:', error);
-      alert('Failed to submit exam: ' + (error.response?.data?.detail || error.message));
+      alert(t('common.error') + ': ' + (error.response?.data?.detail || error.message));
       setSubmitting(false);
     }
   };
@@ -111,8 +192,8 @@ const ExamInterface = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6]">
         <div className="text-center">
-          <div className="spinner mx-auto mb-4"></div>
-          <p className="text-xl font-semibold text-[#92400E]">Loading your exam...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#F59E0B] mx-auto mb-4"></div>
+          <p className="text-xl font-semibold text-[#92400E]">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -157,7 +238,7 @@ const ExamInterface = () => {
                   <div key={skill} className="bg-white border-2 border-[#E5E7EB] rounded-lg p-4">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm font-semibold text-[#374151] capitalize">
-                        {skill.replace(/_/g, ' ')}
+                        {t(`skills.${skill}`) || skill.replace(/_/g, ' ')}
                       </span>
                       <span className="text-lg md:text-xl font-bold" style={{color: percentage >= 70 ? '#10B981' : percentage >= 50 ? '#F59E0B' : '#EF4444'}}>
                         {percentage}%
@@ -181,8 +262,9 @@ const ExamInterface = () => {
               onClick={() => navigate('/dashboard')}
               className="w-full py-4 bg-[#F59E0B] text-white font-bold rounded-lg hover:bg-[#D97706] transition-all text-base md:text-lg"
               style={{fontFamily: 'Manrope, sans-serif'}}
+              data-testid="back-to-dashboard-btn"
             >
-              Back to Dashboard →
+              {t('common.backToDashboard')} →
             </button>
           </div>
         </div>
@@ -190,7 +272,7 @@ const ExamInterface = () => {
     );
   }
 
-  const questions = exam.questions || [];
+  const questions = exam.paper1_questions || [];
   const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
   const answeredCount = Object.keys(answers).length;
@@ -199,8 +281,8 @@ const ExamInterface = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6]">
         <div className="text-center">
-          <div className="spinner mx-auto mb-4"></div>
-          <p className="text-lg font-semibold text-[#92400E]">Loading Question...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#F59E0B] mx-auto mb-4"></div>
+          <p className="text-lg font-semibold text-[#92400E]">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -218,20 +300,27 @@ const ExamInterface = () => {
               </div>
               <div>
                 <h1 className="text-lg md:text-xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{exam.title}</h1>
-                <p className="text-xs md:text-sm text-[#6B7280]">Question {currentQuestionIndex + 1} of {questions.length}</p>
+                <p className="text-xs md:text-sm text-[#6B7280]">{t('exam.question')} {currentQuestionIndex + 1} / {questions.length}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
+              {saving && (
+                <div className="flex items-center gap-2 text-blue-600 text-sm">
+                  <Save className="w-4 h-4 animate-pulse" />
+                  <span>Saving...</span>
+                </div>
+              )}
               <div className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold ${timeLeft < 300 ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
                 <Clock className="w-5 h-5" />
-                <span className="text-lg">{formatTime(timeLeft)}</span>
+                <span className="text-lg" data-testid="exam-timer">{formatTime(timeLeft)}</span>
               </div>
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50"
+                className="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                data-testid="submit-exam-btn"
               >
-                {submitting ? 'Submitting...' : 'Submit'}
+                {submitting ? t('common.loading') : t('exam.submit')}
               </button>
             </div>
           </div>
@@ -252,7 +341,7 @@ const ExamInterface = () => {
           {/* Question */}
           <div className="flex justify-between items-start mb-6">
             <h2 className="text-xl md:text-2xl font-bold text-[#1F2937] flex-1" style={{fontFamily: 'Manrope, sans-serif'}}>
-              {currentQuestion.question_text}
+              {currentQuestion.question_number}. {currentQuestion.question_text}
             </h2>
             <button
               onClick={() => toggleFlag(currentQuestion.id)}
@@ -261,6 +350,7 @@ const ExamInterface = () => {
                   ? 'bg-red-100 text-red-600' 
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
+              data-testid="flag-question-btn"
             >
               <Flag className="w-5 h-5" fill={flagged.has(currentQuestion.id) ? 'currentColor' : 'none'} />
             </button>
@@ -268,25 +358,24 @@ const ExamInterface = () => {
 
           {/* Options */}
           <div className="space-y-3">
-            {['A', 'B', 'C', 'D', 'E'].map((option) => {
-              const optionText = currentQuestion[`option_${option.toLowerCase()}`];
-              if (!optionText) return null;
-              
-              const isSelected = answers[currentQuestion.id] === option;
+            {currentQuestion.options?.map((opt, idx) => {
+              const optionLetter = String.fromCharCode(65 + idx); // A, B, C, D, E
+              const isSelected = answers[currentQuestion.id] === opt.option_id;
               
               return (
                 <button
-                  key={option}
-                  onClick={() => handleAnswerSelect(currentQuestion.id, option)}
+                  key={opt.option_id}
+                  onClick={() => handleAnswerSelect(currentQuestion.id, opt.option_id)}
                   className={`w-full p-4 text-left rounded-lg border-2 transition-all ${
                     isSelected
                       ? 'border-[#F59E0B] bg-[#FFF7E5] font-semibold'
                       : 'border-[#E5E7EB] hover:border-[#F59E0B] hover:bg-[#FFFBF0]'
                   }`}
                   style={{fontFamily: 'Figtree, sans-serif'}}
+                  data-testid={`option-${optionLetter}`}
                 >
-                  <span className="font-bold text-[#F59E0B] mr-3">{option}.</span>
-                  <span className="text-[#1F2937]">{optionText}</span>
+                  <span className="font-bold text-[#F59E0B] mr-3">{optionLetter}.</span>
+                  <span className="text-[#1F2937]">{opt.text}</span>
                 </button>
               );
             })}
@@ -298,10 +387,11 @@ const ExamInterface = () => {
           <button
             onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
             disabled={currentQuestionIndex === 0}
-            className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            data-testid="prev-question-btn"
           >
             <ArrowLeft className="w-5 h-5" />
-            Previous
+            {t('exam.previous')}
           </button>
           
           <div className="text-center">
@@ -313,11 +403,57 @@ const ExamInterface = () => {
           <button
             onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
             disabled={currentQuestionIndex === questions.length - 1}
-            className="flex items-center gap-2 px-6 py-3 bg-[#F59E0B] text-white font-semibold rounded-lg hover:bg-[#D97706] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-3 bg-[#F59E0B] text-white font-semibold rounded-lg hover:bg-[#D97706] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            data-testid="next-question-btn"
           >
-            Next
+            {t('exam.next')}
             <ArrowRight className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* Question Palette */}
+        <div className="mt-6 bg-white rounded-xl shadow-lg p-4 border-2 border-[#E5E7EB]">
+          <h3 className="text-sm font-bold text-[#1F2937] mb-3" style={{fontFamily: 'Manrope, sans-serif'}}>Question Navigator</h3>
+          <div className="grid grid-cols-10 gap-2">
+            {questions.map((q, idx) => {
+              const isAnswered = answers[q.id];
+              const isFlagged = flagged.has(q.id);
+              const isCurrent = idx === currentQuestionIndex;
+              
+              return (
+                <button
+                  key={q.id}
+                  onClick={() => setCurrentQuestionIndex(idx)}
+                  className={`w-10 h-10 rounded-lg font-semibold text-sm transition-all ${
+                    isCurrent
+                      ? 'bg-[#F59E0B] text-white border-2 border-[#D97706]'
+                      : isAnswered
+                        ? 'bg-green-100 text-green-700 border-2 border-green-300'
+                        : isFlagged
+                          ? 'bg-red-100 text-red-700 border-2 border-red-300'
+                          : 'bg-gray-100 text-gray-600 border-2 border-gray-300'
+                  }`}
+                  data-testid={`nav-question-${idx + 1}`}
+                >
+                  {idx + 1}
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-4 flex gap-4 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-green-100 border-2 border-green-300"></div>
+              <span>Answered</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-gray-100 border-2 border-gray-300"></div>
+              <span>Not Answered</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-red-100 border-2 border-red-300"></div>
+              <span>Flagged</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

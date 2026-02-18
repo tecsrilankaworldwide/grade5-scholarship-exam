@@ -419,13 +419,25 @@ class ExamPlatformTester:
             if attempt and exam:
                 # Save some answers
                 questions = exam.get("questions", [])
-                if questions:
+                if questions and len(questions) > 0:
+                    # Check question structure
+                    first_q = questions[0]
+                    print(f"   Question structure keys: {list(first_q.keys())}")
+                    
                     # Answer first 3 questions
                     for i, question in enumerate(questions[:3]):
-                        q_id = question["id"]
-                        # Select first option
-                        option_id = question["options"][0]["option_id"]
-                        self.test_save_answer(attempt["id"], q_id, option_id)
+                        # Handle different question structures
+                        q_id = question.get("id") or question.get("question_number") or str(i)
+                        options = question.get("options", [])
+                        
+                        if options:
+                            # Select first option
+                            if isinstance(options[0], dict):
+                                option_id = options[0].get("option_id", options[0].get("text", "A"))
+                            else:
+                                option_id = "A"  # Default to A
+                            
+                            self.test_save_answer(attempt["id"], q_id, option_id)
                     
                     # Submit exam
                     result = self.test_submit_exam(attempt["id"])

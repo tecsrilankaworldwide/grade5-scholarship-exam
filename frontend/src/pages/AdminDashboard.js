@@ -2,23 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, API } from '../AuthContext';
 import axios from 'axios';
-import { Shield, Users, FileText, LogOut, Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Users, UserPlus, LogOut, Search, Check, X } from 'lucide-react';
+import AcademicLogo from '../components/AcademicLogo';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const AdminDashboard = () => {
   const { t } = useTranslation();
   const { user, token, logout } = useAuth();
-  const [stats, setStats] = useState({
-    students: 0,
-    teachers: 0,
-    parents: 0,
-    exams: 0
-  });
   const [users, setUsers] = useState([]);
-  const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAddUser, setShowAddUser] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterRole, setFilterRole] = useState('all');
+  const [showCreateUser, setShowCreateUser] = useState(false);
+
+  // New user form
   const [newUser, setNewUser] = useState({
     email: '',
     password: '',
@@ -28,69 +25,41 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    loadData();
+    // In real implementation, there would be an admin endpoint to list all users
+    // For now, we'll show a placeholder
+    setLoading(false);
+    setUsers([]);
   }, []);
 
-  const loadData = async () => {
-    try {
-      const examsRes = await axios.get(`${API}/exams`);
-      setExams(examsRes.data.exams || []);
-      
-      const mockUsers = [
-        { id: '1', email: 'admin@exambureau.com', full_name: 'Admin User', role: 'admin', is_active: true },
-        { id: '2', email: 'teacher@exambureau.com', full_name: 'Teacher User', role: 'teacher', is_active: true },
-        { id: '3', email: 'student@test.com', full_name: 'Student User', role: 'student', grade: 'grade_5', is_active: true },
-        { id: '4', email: 'parent@test.com', full_name: 'Parent User', role: 'parent', is_active: true }
-      ];
-      setUsers(mockUsers);
-
-      setStats({
-        students: mockUsers.filter(u => u.role === 'student').length,
-        teachers: mockUsers.filter(u => u.role === 'teacher').length,
-        parents: mockUsers.filter(u => u.role === 'parent').length,
-        exams: examsRes.data.exams?.length || 0
-      });
-      
-      setLoading(false);
-    } catch (error) {
-      console.error('Failed to load data:', error);
-      setLoading(false);
-    }
-  };
-
-  const handleAddUser = async () => {
-    if (!newUser.email || !newUser.password || !newUser.full_name) {
-      alert('Please fill all required fields!');
-      return;
-    }
-
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
     try {
       await axios.post(
         `${API}/register`,
-        newUser
+        newUser,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       alert('User created successfully!');
-      setShowAddUser(false);
-      setNewUser({ email: '', password: '', full_name: '', role: 'student', grade: 'grade_5' });
-      loadData();
+      setShowCreateUser(false);
+      setNewUser({
+        email: '',
+        password: '',
+        full_name: '',
+        role: 'student',
+        grade: 'grade_5'
+      });
+      // Reload users
     } catch (error) {
-      alert('Failed to create user: ' + (error.response?.data?.detail || error.message));
+      alert('Error: ' + (error.response?.data?.detail || error.message));
     }
   };
 
-  const filteredUsers = users.filter(u => 
-    u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.role.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6]">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          u.full_name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRole = filterRole === 'all' || u.role === filterRole;
+    return matchesSearch && matchesRole;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFFBF0] to-[#FFF4E6]">
@@ -100,7 +69,7 @@ const AdminDashboard = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-[#F59E0B] rounded-lg flex items-center justify-center">
-                <Shield className="w-7 h-7 text-white" strokeWidth={2.5} />
+                <Users className="w-7 h-7 text-white" strokeWidth={2.5} />
               </div>
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>{t('dashboard.admin')}</h1>
@@ -110,19 +79,19 @@ const AdminDashboard = () => {
             <div className="flex gap-3">
               <LanguageSwitcher />
               <button
-                onClick={() => setShowAddUser(true)}
-                className="px-3 md:px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base"
-                data-testid="add-user-button"
+                onClick={() => setShowCreateUser(true)}
+                className="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                data-testid="create-user-btn"
               >
-                <Plus className="inline w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">{t('admin.addUser')}</span>
+                <UserPlus className="w-4 h-4" />
+                <span className="hidden md:inline">{t('admin.addUser')}</span>
               </button>
               <button
                 onClick={logout}
-                className="px-3 md:px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-1"
                 data-testid="logout-btn"
               >
-                <LogOut className="inline w-4 h-4 mr-1" />
+                <LogOut className="w-4 h-4" />
                 <span className="hidden md:inline">{t('auth.logout')}</span>
               </button>
             </div>
@@ -130,209 +99,238 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:pl-48 xl:pl-60 py-8">
-        {/* Stats Cards */}
+        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border-2 border-[#E5E7EB]">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-[#EFF6FF] rounded-lg flex items-center justify-center mb-3">
-              <Users className="w-5 h-5 md:w-6 md:h-6 text-[#3B82F6]" />
-            </div>
-            <div className="text-2xl md:text-3xl font-bold mb-1 text-[#3B82F6]" style={{fontFamily: 'Manrope, sans-serif'}}>{stats.students}</div>
-            <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('teacher.students')}</div>
+          <div className="bg-white rounded-xl p-6 shadow-md border-2 border-[#E5E7EB]">
+            <div className="text-3xl font-bold text-[#1F2937] mb-1" style={{fontFamily: 'Manrope, sans-serif'}}>{users.length}</div>
+            <div className="text-sm font-medium text-[#6B7280]">Total Users</div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border-2 border-[#E5E7EB]">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-[#ECFDF5] rounded-lg flex items-center justify-center mb-3">
-              <FileText className="w-5 h-5 md:w-6 md:h-6 text-[#10B981]" />
+          <div className="bg-white rounded-xl p-6 shadow-md border-2 border-[#E5E7EB]">
+            <div className="text-3xl font-bold text-[#3B82F6] mb-1" style={{fontFamily: 'Manrope, sans-serif'}}>
+              {users.filter(u => u.role === 'student').length}
             </div>
-            <div className="text-2xl md:text-3xl font-bold mb-1 text-[#10B981]" style={{fontFamily: 'Manrope, sans-serif'}}>{stats.exams}</div>
-            <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('exam.available')}</div>
+            <div className="text-sm font-medium text-[#6B7280]">Students</div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border-2 border-[#E5E7EB]">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-[#FFF7E5] rounded-lg flex items-center justify-center mb-3">
-              <Shield className="w-5 h-5 md:w-6 md:h-6 text-[#F59E0B]" />
+          <div className="bg-white rounded-xl p-6 shadow-md border-2 border-[#E5E7EB]">
+            <div className="text-3xl font-bold text-[#10B981] mb-1" style={{fontFamily: 'Manrope, sans-serif'}}>
+              {users.filter(u => u.role === 'teacher').length}
             </div>
-            <div className="text-2xl md:text-3xl font-bold mb-1 text-[#F59E0B]" style={{fontFamily: 'Manrope, sans-serif'}}>{stats.teachers}</div>
-            <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('admin.teachers')}</div>
+            <div className="text-sm font-medium text-[#6B7280]">{t('admin.teachers')}</div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border-2 border-[#E5E7EB]">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-3">
-              <Users className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
+          <div className="bg-white rounded-xl p-6 shadow-md border-2 border-[#E5E7EB]">
+            <div className="text-3xl font-bold text-[#F59E0B] mb-1" style={{fontFamily: 'Manrope, sans-serif'}}>
+              {users.filter(u => u.role === 'parent').length}
             </div>
-            <div className="text-2xl md:text-3xl font-bold mb-1 text-purple-600" style={{fontFamily: 'Manrope, sans-serif'}}>{stats.parents}</div>
-            <div className="text-xs md:text-sm font-medium text-[#6B7280]">{t('admin.parents')}</div>
+            <div className="text-sm font-medium text-[#6B7280]">{t('admin.parents')}</div>
           </div>
         </div>
 
         {/* User Management */}
-        <div className="bg-white rounded-xl shadow-md p-6 md:p-8 border-2 border-[#E5E7EB]">
-          <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
-            <h2 className="text-xl md:text-2xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
-              {t('admin.userManagement')}
-            </h2>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <div className="bg-white rounded-xl shadow-md p-6 border-2 border-[#E5E7EB]">
+          <h2 className="text-2xl font-bold mb-6 text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
+            {t('admin.userManagement')}
+          </h2>
+
+          {/* Filters */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder={`${t('common.search')}...`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border-2 border-[#E5E7EB] rounded-lg w-full md:w-64"
-                data-testid="search-users-input"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('common.search') + " users..."}
+                className="w-full pl-10 pr-4 py-2 border-2 border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#F59E0B]"
+                data-testid="user-search-input"
               />
             </div>
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="px-4 py-2 border-2 border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#F59E0B]"
+              data-testid="user-role-filter"
+            >
+              <option value="all">All Roles</option>
+              <option value="student">Students</option>
+              <option value="teacher">Teachers</option>
+              <option value="parent">Parents</option>
+              <option value="admin">Admins</option>
+              <option value="typesetter">Typesetters</option>
+            </select>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b-2 border-[#E5E7EB]">
-                  <th className="text-left py-3 px-4 font-bold text-[#1F2937]">Name</th>
-                  <th className="text-left py-3 px-4 font-bold text-[#1F2937]">Email</th>
-                  <th className="text-left py-3 px-4 font-bold text-[#1F2937]">Role</th>
-                  <th className="text-left py-3 px-4 font-bold text-[#1F2937]">Status</th>
-                  <th className="text-left py-3 px-4 font-bold text-[#1F2937]">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map(u => (
-                  <tr key={u.id} className="border-b border-[#E5E7EB] hover:bg-[#FFF7E5]" data-testid={`user-row-${u.id}`}>
-                    <td className="py-3 px-4 font-semibold">{u.full_name}</td>
-                    <td className="py-3 px-4 text-[#6B7280]">{u.email}</td>
-                    <td className="py-3 px-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                        u.role === 'teacher' ? 'bg-blue-100 text-blue-700' :
-                        u.role === 'student' ? 'bg-green-100 text-green-700' :
-                        'bg-orange-100 text-orange-700'
-                      }`}>
-                        {u.role.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      {u.is_active ? (
-                        <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-                          ✓ {t('admin.active')}
-                        </span>
-                      ) : (
-                        <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">
-                          ✕ {t('admin.inactive')}
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-2">
-                        <button className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200">
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
+          {/* Users List */}
+          {users.length === 0 ? (
+            <div className="text-center py-12">
+              <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-xl font-semibold text-gray-600 mb-2">No Users Yet</p>
+              <p className="text-gray-500 text-sm">
+                User management interface for listing, creating, and managing users.
+              </p>
+              <button
+                onClick={() => setShowCreateUser(true)}
+                className="mt-4 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"
+              >
+                {t('admin.addUser')}
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Email</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Role</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Grade</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredUsers.map(u => (
+                    <tr key={u.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm font-medium text-[#1F2937]">{u.full_name}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{u.email}</td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{u.grade?.replace('_', ' ') || '-'}</td>
+                      <td className="px-4 py-3 text-sm">
+                        {u.is_active ? (
+                          <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                            {t('admin.active')}
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">
+                            {t('admin.inactive')}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <button className="text-blue-600 hover:text-blue-800 font-semibold">
+                          {t('common.edit')}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Add User Modal */}
-      {showAddUser && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <div className="bg-white rounded-2xl shadow-2xl border-2 border-[#E5E7EB] p-8 max-w-md w-full">
-            <h3 className="text-2xl font-bold mb-6 text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
-              {t('admin.addUser')}
-            </h3>
+      {/* Create User Modal */}
+      {showCreateUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShowCreateUser(false)}>
+          <div 
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b-2 border-[#E5E7EB] flex justify-between items-center">
+              <h3 className="text-xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
+                {t('admin.addUser')}
+              </h3>
+              <button
+                onClick={() => setShowCreateUser(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
 
-            <div className="space-y-4">
+            <form onSubmit={handleCreateUser} className="p-6 space-y-4">
               <div>
-                <label className="block font-semibold mb-2 text-[#374151]">Full Name *</label>
+                <label className="block text-sm font-semibold text-[#374151] mb-2">Full Name *</label>
                 <input
                   type="text"
+                  required
                   value={newUser.full_name}
                   onChange={(e) => setNewUser({...newUser, full_name: e.target.value})}
-                  className="w-full px-4 py-3 border-2 border-[#E5E7EB] rounded-lg"
-                  placeholder="Enter full name"
+                  className="w-full px-4 py-2 border-2 border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#F59E0B]"
                   data-testid="new-user-name-input"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold mb-2 text-[#374151]">Email *</label>
+                <label className="block text-sm font-semibold text-[#374151] mb-2">Email *</label>
                 <input
                   type="email"
+                  required
                   value={newUser.email}
                   onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                  className="w-full px-4 py-3 border-2 border-[#E5E7EB] rounded-lg"
-                  placeholder="Enter email"
+                  className="w-full px-4 py-2 border-2 border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#F59E0B]"
                   data-testid="new-user-email-input"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold mb-2 text-[#374151]">{t('auth.password')} *</label>
+                <label className="block text-sm font-semibold text-[#374151] mb-2">Password *</label>
                 <input
                   type="password"
+                  required
                   value={newUser.password}
                   onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                  className="w-full px-4 py-3 border-2 border-[#E5E7EB] rounded-lg"
-                  placeholder={t('auth.passwordPlaceholder')}
+                  className="w-full px-4 py-2 border-2 border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#F59E0B]"
                   data-testid="new-user-password-input"
                 />
               </div>
 
-              <div>
-                <label className="block font-semibold mb-2 text-[#374151]">Role *</label>
-                <select
-                  value={newUser.role}
-                  onChange={(e) => setNewUser({...newUser, role: e.target.value})}
-                  className="w-full px-4 py-3 border-2 border-[#E5E7EB] rounded-lg"
-                  data-testid="new-user-role-select"
-                >
-                  <option value="student">Student</option>
-                  <option value="teacher">Teacher</option>
-                  <option value="parent">Parent</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-
-              {newUser.role === 'student' && (
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-semibold mb-2 text-[#374151]">Grade *</label>
+                  <label className="block text-sm font-semibold text-[#374151] mb-2">Role *</label>
+                  <select
+                    value={newUser.role}
+                    onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                    className="w-full px-4 py-2 border-2 border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#F59E0B]"
+                    data-testid="new-user-role-select"
+                  >
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="parent">Parent</option>
+                    <option value="admin">Admin</option>
+                    <option value="typesetter">Typesetter</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-[#374151] mb-2">Grade</label>
                   <select
                     value={newUser.grade}
                     onChange={(e) => setNewUser({...newUser, grade: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-[#E5E7EB] rounded-lg"
+                    className="w-full px-4 py-2 border-2 border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#F59E0B]"
                     data-testid="new-user-grade-select"
                   >
-                    <option value="grade_2">{t('common.grade2')}</option>
-                    <option value="grade_3">{t('common.grade3')}</option>
-                    <option value="grade_4">{t('common.grade4')}</option>
-                    <option value="grade_5">{t('common.grade5')}</option>
+                    <option value="grade_2">Grade 2</option>
+                    <option value="grade_3">Grade 3</option>
+                    <option value="grade_4">Grade 4</option>
+                    <option value="grade_5">Grade 5</option>
                   </select>
                 </div>
-              )}
-            </div>
+              </div>
 
-            <div className="flex gap-3 mt-8">
-              <button
-                onClick={() => setShowAddUser(false)}
-                className="flex-1 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300"
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                onClick={handleAddUser}
-                className="flex-1 py-3 bg-[#F59E0B] text-white font-semibold rounded-lg hover:bg-[#D97706]"
-                data-testid="confirm-add-user-button"
-              >
-                {t('admin.addUser')}
-              </button>
-            </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateUser(false)}
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                  data-testid="submit-create-user-btn"
+                >
+                  {t('common.create')}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

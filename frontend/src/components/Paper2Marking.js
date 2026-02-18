@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth, API } from '../AuthContext';
 import axios from 'axios';
 import { X, Save, FileText } from 'lucide-react';
 
 const Paper2Marking = ({ onClose }) => {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const [submissions, setSubmissions] = useState([]);
-  const [selectedSubmission, setSelectedSubmission] = useState(null);
-  const [marks, setMarks] = useState({
-    essay_marks: 0,
-    short_answer_marks: Array(10).fill(0),
-    comments: ''
-  });
   const [loading, setLoading] = useState(true);
+  const [selectedSubmission, setSelectedSubmission] = useState(null);
+  const [essayMarks, setEssayMarks] = useState(0);
+  const [shortAnswerMarks, setShortAnswerMarks] = useState(Array(10).fill(0));
+  const [comments, setComments] = useState('');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     loadSubmissions();
@@ -20,18 +21,9 @@ const Paper2Marking = ({ onClose }) => {
 
   const loadSubmissions = async () => {
     try {
-      // Mock data - in production, fetch from backend
-      setSubmissions([
-        {
-          id: 'sub1',
-          student_name: 'Sample Student',
-          exam_title: 'January 2024 - Grade 5 Exam',
-          submitted_via: 'whatsapp',
-          essay_marks: 0,
-          total_marks: 0,
-          marked: false
-        }
-      ]);
+      // In a real implementation, there would be an endpoint to fetch all paper2 submissions
+      // For now, we'll show a placeholder
+      setSubmissions([]);
       setLoading(false);
     } catch (error) {
       console.error('Failed to load submissions:', error);
@@ -39,166 +31,216 @@ const Paper2Marking = ({ onClose }) => {
     }
   };
 
-  const handleMarkSubmission = async () => {
+  const handleMark = async () => {
     if (!selectedSubmission) return;
 
+    setSaving(true);
     try {
       await axios.put(
         `${API}/paper2/${selectedSubmission.id}/mark`,
-        marks,
+        {
+          essay_marks: essayMarks,
+          short_answer_marks: shortAnswerMarks,
+          comments
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert('Paper 2 marked successfully!');
+      alert('Marks saved successfully!');
       setSelectedSubmission(null);
       loadSubmissions();
     } catch (error) {
-      alert('Failed to mark paper: ' + (error.response?.data?.detail || error.message));
+      console.error('Failed to save marks:', error);
+      alert('Error: ' + (error.response?.data?.detail || error.message));
+    } finally {
+      setSaving(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
+  const updateShortAnswerMark = (index, value) => {
+    const updated = [...shortAnswerMarks];
+    updated[index] = Math.min(2, Math.max(0, parseInt(value) || 0));
+    setShortAnswerMarks(updated);
+  };
+
+  const totalShortAnswerMarks = shortAnswerMarks.reduce((sum, mark) => sum + mark, 0);
+  const totalMarks = essayMarks + totalShortAnswerMarks;
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 overflow-y-auto p-6">
-      <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl border-4" style={{borderColor: '#F59E0B'}}>
-        <div className="p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-extrabold" style={{color: '#92400E', fontFamily: 'Nunito'}}>
-              <FileText className="inline w-7 h-7 mr-2" />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div 
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b-2 border-[#E5E7EB] p-6 flex justify-between items-center z-10">
+          <div>
+            <h2 className="text-2xl font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
               Paper 2 Marking
             </h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
+            <p className="text-sm text-[#6B7280] mt-1">Mark essay and short answer questions</p>
           </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            data-testid="close-paper2-marking"
+          >
+            <X className="w-6 h-6 text-gray-600" />
+          </button>
+        </div>
 
-          {!selectedSubmission ? (
-            <div>
-              <p className="text-gray-600 mb-6">Select a submission to mark</p>
-              
-              {submissions.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">📝</div>
-                  <p className="text-lg text-gray-600">No Paper 2 submissions yet</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {submissions.map(sub => (
-                    <div
-                      key={sub.id}
-                      className="p-6 bg-yellow-50 border-3 border-yellow-200 rounded-2xl hover:shadow-lg transition-shadow cursor-pointer"
-                      onClick={() => setSelectedSubmission(sub)}
-                    >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h3 className="text-xl font-bold" style={{color: '#92400E'}}>{sub.student_name}</h3>
-                          <p className="text-sm text-gray-600">{sub.exam_title}</p>
-                          <p className="text-sm text-gray-500">Submitted via: {sub.submitted_via}</p>
-                        </div>
-                        <div>
-                          {sub.marked ? (
-                            <span className="px-4 py-2 bg-green-500 text-white font-semibold rounded-xl">
-                              Marked ({sub.total_marks}/40)
-                            </span>
-                          ) : (
-                            <span className="px-4 py-2 bg-red-500 text-white font-semibold rounded-xl">
-                              Pending
-                            </span>
-                          )}
-                        </div>
-                      </div>
+        <div className="p-6">
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#F59E0B] mx-auto mb-4"></div>
+              <p className="text-gray-600">{t('common.loading')}</p>
+            </div>
+          ) : submissions.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-xl font-semibold text-gray-600 mb-2">No Submissions Yet</p>
+              <p className="text-gray-500">
+                Paper 2 submissions from students will appear here for marking.
+              </p>
+              <p className="text-sm text-gray-400 mt-4">
+                Students submit Paper 2 (Essay + Short Answers) via WhatsApp,
+                <br />and teachers can mark them here once submissions are recorded.
+              </p>
+            </div>
+          ) : !selectedSubmission ? (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600 mb-4">
+                Select a submission to mark. Total submissions: {submissions.length}
+              </p>
+              {submissions.map(submission => (
+                <div
+                  key={submission.id}
+                  className="p-4 border-2 border-[#E5E7EB] rounded-lg hover:border-[#F59E0B] cursor-pointer transition-colors"
+                  onClick={() => {
+                    setSelectedSubmission(submission);
+                    setEssayMarks(submission.essay_marks || 0);
+                    setShortAnswerMarks(submission.short_answer_marks || Array(10).fill(0));
+                    setComments(submission.teacher_comments || '');
+                  }}
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-semibold text-[#1F2937]">Student ID: {submission.student_id}</p>
+                      <p className="text-sm text-gray-600">Exam: {submission.exam_id}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Submitted via: {submission.submitted_via}
+                      </p>
                     </div>
-                  ))}
+                    <div className="text-right">
+                      {submission.marked_at ? (
+                        <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                          Marked ({submission.total_marks}/40)
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">
+                          Pending
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
           ) : (
-            <div>
-              <div className="mb-6 p-4 bg-blue-50 rounded-xl border-2 border-blue-300">
-                <h3 className="font-bold text-lg" style={{color: '#2563EB'}}>Marking: {selectedSubmission.student_name}</h3>
-                <p className="text-sm text-gray-600">{selectedSubmission.exam_title}</p>
+            <div className="space-y-6">
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                <p className="text-sm font-semibold text-blue-900 mb-1">Marking Submission</p>
+                <p className="text-xs text-blue-700">Student: {selectedSubmission.student_id}</p>
+                <p className="text-xs text-blue-700">Exam: {selectedSubmission.exam_id}</p>
               </div>
 
               {/* Essay Marking */}
-              <div className="mb-6 p-6 bg-white rounded-2xl border-3 border-yellow-200">
-                <h4 className="font-bold text-lg mb-4" style={{color: '#92400E'}}>Essay (20 marks)</h4>
-                <input
-                  type="number"
-                  min="0"
-                  max="20"
-                  value={marks.essay_marks}
-                  onChange={(e) => setMarks({...marks, essay_marks: parseInt(e.target.value) || 0})}
-                  className="w-full px-4 py-3 border-3 border-yellow-300 rounded-xl text-xl font-bold"
-                  placeholder="Enter marks (0-20)"
-                />
+              <div className="bg-white border-2 border-[#E5E7EB] rounded-lg p-6">
+                <h3 className="text-lg font-bold text-[#1F2937] mb-4" style={{fontFamily: 'Manrope, sans-serif'}}>
+                  Essay Question (Out of 20 marks)
+                </h3>
+                <div className="flex items-center gap-4">
+                  <label className="text-sm font-semibold text-[#374151]">Marks:</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="20"
+                    value={essayMarks}
+                    onChange={(e) => setEssayMarks(Math.min(20, Math.max(0, parseInt(e.target.value) || 0)))}
+                    className="w-24 px-4 py-2 border-2 border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#F59E0B]"
+                    data-testid="essay-marks-input"
+                  />
+                  <span className="text-sm text-gray-600">/ 20</span>
+                </div>
               </div>
 
-              {/* Short Answers Marking */}
-              <div className="mb-6 p-6 bg-white rounded-2xl border-3 border-yellow-200">
-                <h4 className="font-bold text-lg mb-4" style={{color: '#92400E'}}>Short Answers (10 × 2 marks = 20 marks)</h4>
-                <div className="grid grid-cols-5 gap-4">
-                  {marks.short_answer_marks.map((mark, idx) => (
-                    <div key={idx}>
-                      <label className="text-sm font-semibold text-gray-600">Q{idx + 1}</label>
+              {/* Short Answer Marking */}
+              <div className="bg-white border-2 border-[#E5E7EB] rounded-lg p-6">
+                <h3 className="text-lg font-bold text-[#1F2937] mb-4" style={{fontFamily: 'Manrope, sans-serif'}}>
+                  Short Answer Questions (10 questions, 2 marks each)
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  {Array(10).fill(null).map((_, idx) => (
+                    <div key={idx} className="flex flex-col gap-2">
+                      <label className="text-xs font-semibold text-[#374151]">Q{idx + 1}</label>
                       <input
                         type="number"
                         min="0"
                         max="2"
-                        value={mark}
-                        onChange={(e) => {
-                          const newMarks = [...marks.short_answer_marks];
-                          newMarks[idx] = parseInt(e.target.value) || 0;
-                          setMarks({...marks, short_answer_marks: newMarks});
-                        }}
-                        className="w-full px-3 py-2 border-2 border-yellow-300 rounded-lg font-bold"
+                        value={shortAnswerMarks[idx]}
+                        onChange={(e) => updateShortAnswerMark(idx, e.target.value)}
+                        className="w-full px-3 py-2 border-2 border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#F59E0B] text-center"
+                        data-testid={`short-answer-${idx + 1}-input`}
                       />
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Total Marks Display */}
-              <div className="mb-6 p-4 bg-green-50 rounded-xl border-3 border-green-300">
-                <p className="text-2xl font-extrabold" style={{color: '#059669'}}>
-                  Total: {marks.essay_marks + marks.short_answer_marks.reduce((a, b) => a + b, 0)} / 40
-                </p>
+                <div className="mt-4 text-right">
+                  <span className="text-sm font-semibold text-[#374151]">
+                    Total Short Answers: {totalShortAnswerMarks} / 20
+                  </span>
+                </div>
               </div>
 
               {/* Comments */}
-              <div className="mb-6">
-                <label className="block font-bold mb-2" style={{color: '#92400E'}}>Teacher Comments</label>
+              <div>
+                <label className="block text-sm font-semibold text-[#374151] mb-2">Teacher Comments (Optional)</label>
                 <textarea
-                  value={marks.comments}
-                  onChange={(e) => setMarks({...marks, comments: e.target.value})}
-                  className="w-full px-4 py-3 border-3 border-yellow-300 rounded-xl"
-                  rows={4}
-                  placeholder="Add feedback for the student..."
+                  value={comments}
+                  onChange={(e) => setComments(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#F59E0B] min-h-[100px]"
+                  placeholder="Add any feedback for the student..."
+                  data-testid="teacher-comments-input"
                 />
               </div>
 
+              {/* Total */}
+              <div className="bg-[#FFF7E5] border-2 border-[#F59E0B] rounded-lg p-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-[#1F2937]" style={{fontFamily: 'Manrope, sans-serif'}}>
+                    Total Paper 2 Marks:
+                  </span>
+                  <span className="text-3xl font-bold text-[#F59E0B]" style={{fontFamily: 'Manrope, sans-serif'}}>
+                    {totalMarks} / 40
+                  </span>
+                </div>
+              </div>
+
               {/* Actions */}
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 <button
                   onClick={() => setSelectedSubmission(null)}
-                  className="flex-1 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300"
+                  className="flex-1 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
                 >
-                  Back to List
+                  {t('common.cancel')}
                 </button>
                 <button
-                  onClick={handleMarkSubmission}
-                  className="flex-1 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl"
+                  onClick={handleMark}
+                  disabled={saving}
+                  className="flex-1 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                  data-testid="save-marks-btn"
                 >
-                  <Save className="inline w-5 h-5 mr-2" />
-                  Save Marks
+                  <Save className="w-5 h-5" />
+                  {saving ? t('common.loading') : 'Save Marks'}
                 </button>
               </div>
             </div>

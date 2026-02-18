@@ -21,15 +21,15 @@
   },
   {
     "content": "Phase 2.6: Verify TypesetterDashboard - PDF upload for 3 languages is working",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 2.7: Add axios interceptor for auth token injection",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 2.8: Test and fix i18n translations",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 2.9: Call design_agent for UI polish",
@@ -37,7 +37,7 @@
   },
   {
     "content": "Phase 2.10: Run testing_agent for comprehensive end-to-end testing",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Phase 2.11: Fix all bugs found by testing agent",

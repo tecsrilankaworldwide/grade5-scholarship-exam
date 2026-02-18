@@ -771,7 +771,7 @@ async def upload_exam_pdf(
         raise HTTPException(status_code=400, detail="Only PDF files are allowed")
     
     # Create upload directory if doesn't exist
-    upload_dir = "/root/grade5-scholarship-exam/backend/uploads/exam_pdfs"
+    upload_dir = os.environ.get('UPLOAD_DIR', os.path.join(os.path.dirname(__file__), 'uploads', 'exam_pdfs'))
     os.makedirs(upload_dir, exist_ok=True)
     
     # Generate unique filename
@@ -949,4 +949,5 @@ async def startup_event():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8002)
+    port = int(os.environ.get('PORT', 8001))
+    uvicorn.run(app, host="0.0.0.0", port=port)

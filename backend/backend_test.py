@@ -307,8 +307,8 @@ class ExamPlatformTester:
         # Test 2: Authentication for all roles
         print("🔐 Testing Authentication...")
         credentials = {
-            "admin": ("admin@exambureau.com", "admin123"),
-            "teacher": ("teacher@exambureau.com", "teacher123"),
+            "admin": ("admin@test.com", "admin123"),
+            "teacher": ("teacher@test.com", "teacher123"),
             "student": ("student@test.com", "student123"),
             "parent": ("parent@test.com", "parent123")
         }

@@ -1,23 +1,23 @@
 [
   {
     "content": "Phase 2.1: Fix ExamInterface - Update API calls, autosave, timer with localStorage, resume logic",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Phase 2.2: Complete ExamCreator component for teachers - 60 MCQ questions with skill mapping",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 2.3: Complete Paper2Marking component - fetch submissions, mark essay + 10 short answers",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 2.4: Complete ParentDashboard - progress charts, skill trends, strengths/weaknesses",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 2.5: Complete AdminDashboard - user management (list, create, toggle active)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 2.6: Verify TypesetterDashboard - PDF upload for 3 languages is working",
@@ -25,7 +25,7 @@
   },
   {
     "content": "Phase 2.7: Add axios interceptor for auth token injection",
-    "status": "in_progress"
+    "status": "pending"
   },
   {
     "content": "Phase 2.8: Test and fix i18n translations",

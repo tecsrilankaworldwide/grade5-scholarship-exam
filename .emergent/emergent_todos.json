@@ -1,26 +1,10 @@
 [
   {
-    "content": "Phase 2.11: Fix all bugs found by testing agent",
-    "status": "completed"
-  },
-  {
-    "content": "Fix ESLint configuration conflict in frontend",
-    "status": "completed"
-  },
-  {
-    "content": "Add validation to prevent starting/publishing exams with 0 questions",
-    "status": "completed"
-  },
-  {
-    "content": "Add UI handling in ExamInterface for empty questions",
-    "status": "completed"
-  },
-  {
     "content": "Call design_agent for UI polish",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
-    "content": "Final verification testing",
-    "status": "pending"
+    "content": "Final verification - check all flows working",
+    "status": "in_progress"
   }
 ]

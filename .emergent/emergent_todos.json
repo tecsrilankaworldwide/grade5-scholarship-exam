@@ -1,10 +1,10 @@
 [
   {
-    "content": "Call design_agent for UI polish",
+    "content": "Final verification - check all flows working",
     "status": "completed"
   },
   {
-    "content": "Final verification - check all flows working",
-    "status": "in_progress"
+    "content": "All user stories from plan.md covered and tested",
+    "status": "completed"
   }
 ]

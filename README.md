@@ -1,34 +1,188 @@
-<<<<<<< HEAD
-# Here are your Instructions
-=======
-# Grade 5 Scholarship Examination Platform 🎓
+# Grade 5 Scholarship Examination Platform
 
-A comprehensive digital examination system for Grade 5 scholarship exam preparation in Sri Lanka.
+**Education Reforms Bureau** - Digital Examination System  
+**Domain:** educationreforms.cloud  
+**Tech Stack:** FastAPI (Python), React (JavaScript), MongoDB Atlas
+
+---
+
+## 🎓 Overview
+
+Comprehensive digital examination platform for Grade 2-5 students in Sri Lanka, featuring:
+
+- **MCQ Exams (Paper 1):** 60-question exams with auto-grading and 60-minute timer
+- **Paper 2 Marking:** Manual marking for essay and short answer questions
+- **Skill Tracking:** Performance across 10 skill areas with detailed analytics
+- **Progress Reports:** Monthly charts and trends for parents
+- **Multi-language Support:** Sinhala, Tamil, English
+- **PDF Exam System:** Upload and manage PDF-based exams
+- **Role-based Access:** Student, Teacher, Parent, Admin, Typesetter
+
+---
 
 ## 🌟 Features
 
 ### For Students
-- **MCQ Exams**: Timed 60-question exams with auto-grading
-- **Real-time Timer**: 60-minute countdown with auto-submit
-- **Skill Tracking**: Performance across 10 skill areas
-- **Progress Reports**: Detailed results with skill breakdowns
-- **Resume Support**: Continue exams if connection drops
+- Take timed MCQ exams with autosave
+- Resume exams if connection drops
+- View instant results with skill breakdown
+- Question navigator and flag system
+- Mobile-friendly exam interface
 
 ### For Teachers
-- **Exam Creation**: Build exams with 60 MCQ questions
-- **Skill Mapping**: Tag questions to 10 skill areas
-- **Paper 2 Marking**: Manual marking for essay and short answers
-- **Student Analytics**: Track class performance
+- Create 60-question MCQ exams
+- Assign skill areas to questions
+- Publish exams to students
+- Mark Paper 2 (essay + 10 short answers)
+- View student performance
 
 ### For Parents
-- **Progress Dashboard**: "Blood-report" style skill tracking
-- **Monthly Trends**: View child's improvement over time
-- **Strength/Weakness Analysis**: Identify areas needing focus
+- Monthly progress dashboard
+- Skill radar charts
+- Strengths/weaknesses analysis
+- Historical trends
 
 ### For Admins
-- **User Management**: Manage students, teachers, parents
-- **Exam Scheduling**: Monthly exam configuration
-- **Data Export**: CSV exports for reporting
+- User management (create, edit users)
+- View system statistics
+- Manage all grades and exams
+
+### For Typesetters
+- Create PDF-based exams
+- Upload PDFs in 3 languages (si/ta/en)
+- Manage exam content
+
+---
+
+## 🏗️ Tech Stack
+
+**Backend:**
+- FastAPI (Python 3.11)
+- MongoDB (Atlas M10+)
+- JWT Authentication
+- Async I/O for high concurrency
+
+**Frontend:**
+- React 18
+- React Router for navigation
+- Recharts for data visualization
+- Tailwind CSS + shadcn/ui
+- i18next for multi-language
+
+**Infrastructure:**
+- DigitalOcean Droplet (8GB RAM recommended)
+- MongoDB Atlas (Singapore region)
+- Nginx reverse proxy
+- PM2 process manager
+- Let's Encrypt SSL
+
+---
+
+## 🚀 Quick Start (Development)
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- MongoDB (local or Atlas)
+- Yarn package manager
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/tecsrilankaworldwide/grade5-scholarship-exam.git
+cd grade5-scholarship-exam
+```
+
+### 2. Backend Setup
+
+```bash
+cd backend
+
+# Create virtual environment
+python3.11 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Create .env file (copy from .env.example)
+cp .env.example .env
+nano .env  # Edit with your MongoDB URL and secret key
+
+# Run backend
+uvicorn server:app --reload --host 0.0.0.0 --port 8001
+```
+
+**Backend .env variables:**
+```env
+MONGO_URL=mongodb://localhost:27017
+DB_NAME_EXAM=exam_bureau_db
+SECRET_KEY=your-secret-key-min-32-chars
+CORS_ORIGINS=http://localhost:3000
+```
+
+### 3. Frontend Setup
+
+```bash
+cd frontend
+
+# Install dependencies
+yarn install
+
+# Create .env file
+cp .env.example .env
+nano .env  # Edit with backend URL
+
+# Run frontend
+yarn start
+```
+
+**Frontend .env variables:**
+```env
+REACT_APP_BACKEND_URL=http://localhost:8001
+```
+
+### 4. Access Application
+
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8001/api/
+- API Docs: http://localhost:8001/api/docs
+
+---
+
+## 🔑 Test Credentials
+
+Sample users are auto-created on first backend startup:
+
+- **Student:** student@test.com / student123
+- **Teacher:** teacher@test.com / teacher123
+- **Parent:** parent@test.com / parent123
+- **Admin:** admin@test.com / admin123
+
+---
+
+## 📦 Production Deployment
+
+See **[DIGITALOCEAN_DEPLOYMENT.md](./DIGITALOCEAN_DEPLOYMENT.md)** for comprehensive production deployment guide.
+
+**Quick Summary:**
+1. Prepare DigitalOcean droplet (Ubuntu 22.04+)
+2. Install Node.js, Python 3.11, nginx, PM2
+3. Set up MongoDB Atlas M10+ cluster
+4. Clone repository and configure .env files
+5. Build frontend: `yarn build`
+6. Start backend with PM2
+7. Configure nginx with SSL (Let's Encrypt)
+8. Done! 🎉
+
+**Docker Deployment (Alternative):**
+```bash
+docker-compose up -d
+```
+
+See [docker-compose.yml](./docker-compose.yml) for configuration.
+
+---
 
 ## 🎯 10 Skill Areas Tracked
 
@@ -43,146 +197,148 @@ A comprehensive digital examination system for Grade 5 scholarship exam preparat
 9. Analytical Skills
 10. Critical Thinking
 
-## 🛠️ Tech Stack
+---
 
-- **Backend**: FastAPI (Python)
-- **Frontend**: React.js
-- **Database**: MongoDB
-- **Authentication**: JWT
-- **Charts**: Recharts
+## 📂 Project Structure
 
-## 📋 Prerequisites
-
-- Python 3.11+
-- Node.js 18+
-- MongoDB
-- Yarn
-
-## 🚀 Quick Start
-
-### Backend Setup
-
-```bash
-cd backend
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your MongoDB URL
-
-# Create sample data
-python create_sample_data.py
-
-# Run server
-uvicorn server:app --host 0.0.0.0 --port 8002 --reload
+```
+.
+├── backend/                 # FastAPI backend
+│   ├── server.py           # Main application
+│   ├── requirements.txt    # Python dependencies
+│   ├── .env.example        # Environment template
+│   └── uploads/            # PDF uploads (gitignored)
+├── frontend/               # React frontend
+│   ├── src/
+│   │   ├── pages/         # Page components
+│   │   ├── components/    # Reusable components
+│   │   ├── i18n/          # Translations
+│   │   └── App.js         # Main app
+│   ├── package.json       # Node dependencies
+│   └── .env.example       # Environment template
+├── docker-compose.yml     # Docker setup
+├── DIGITALOCEAN_DEPLOYMENT.md  # Deployment guide
+└── README.md              # This file
 ```
 
-### Frontend Setup
-
-```bash
-cd frontend
-
-# Install dependencies
-yarn install
-
-# Configure environment
-# Create .env file with:
-# REACT_APP_BACKEND_URL=http://localhost:8002
-# PORT=3001
-
-# Run development server
-yarn start
-```
-
-## 🔑 Test Credentials
-
-After running `create_sample_data.py`:
-
-- **Admin**: admin@exambureau.com / admin123
-- **Teacher**: teacher@exambureau.com / teacher123
-- **Student**: student@test.com / student123
-- **Parent**: parent@test.com / parent123
-
-## 📚 API Documentation
-
-Once the backend is running, visit: `http://localhost:8002/docs`
-
-## 🎨 Key Features Details
-
-### Paper 1 (MCQ)
-- 60 questions with 5 options each
-- Auto-grading with immediate results
-- Per-skill score calculation
-- Timer with auto-submit
-- Question flagging for review
-- Progress tracking
-
-### Paper 2 (Essay + Short Answers)
-- Submitted via WhatsApp (external)
-- Teacher manual marking interface
-- Essay (20 marks) + 10 short answers (20 marks)
-- Comments and feedback support
-
-### Progress Tracking
-- Monthly performance graphs
-- Skill-wise trend analysis
-- Strength/weakness identification
-- Historical data retention
-
-## 📱 Screenshots
-
-### Student Exam Interface
-- Clean, distraction-free design
-- Large, readable text
-- Color-coded question navigation
-- Persistent timer display
-
-### Parent Dashboard
-- Line graphs showing skill trends
-- Easy-to-understand visual reports
-- Month-over-month comparisons
+---
 
 ## 🔒 Security
 
 - JWT-based authentication
-- Role-based access control
 - Password hashing with bcrypt
-- Secure MongoDB connections
+- Role-based access control
+- CORS protection
+- Rate limiting on API endpoints
+- SQL injection prevention (using MongoDB)
+- XSS protection headers
 
-## 📦 Project Structure
-
-```
-.
-├── backend/
-│   ├── server.py              # Main FastAPI application
-│   ├── create_sample_data.py  # Sample data generator
-│   └── requirements.txt       # Python dependencies
-├── frontend/
-│   ├── src/
-│   │   ├── pages/            # Page components
-│   │   ├── components/       # Reusable components
-│   │   └── AuthContext.js    # Authentication context
-│   └── package.json          # Node dependencies
-└── README.md
-```
-
-## 🤝 Contributing
-
-This is a private educational platform. For questions or support, contact TEC Sri Lanka Worldwide.
-
-## 📄 License
-
-Proprietary - © 2026 TEC Sri Lanka Worldwide (Pvt.) Ltd
-
-## 📞 Contact
-
-- **Organization**: TEC Sri Lanka Worldwide (Pvt.) Ltd
-- **Established**: 1982 (42 Years of Educational Excellence)
-- **Website**: www.tecaikids.com
+**Important:** Never commit `.env` files! Always use `.env.example` templates.
 
 ---
 
-Built with ❤️ for Sri Lankan students preparing for Grade 5 Scholarship Exams
->>>>>>> 4ee35018177a3705523316c49228955afe58e27f
+## 🌐 API Endpoints
+
+**Authentication:**
+- `POST /api/register` - Register new user
+- `POST /api/login` - Login user
+
+**Exams:**
+- `GET /api/exams` - List exams
+- `POST /api/exams/create` - Create exam (teacher)
+- `POST /api/exams/{id}/start` - Start exam (student)
+- `POST /api/attempts/{id}/save` - Save answer
+- `POST /api/attempts/{id}/submit` - Submit exam
+- `PUT /api/exams/{id}/publish` - Publish exam
+
+**Progress:**
+- `GET /api/students/{id}/progress` - Get student progress
+
+**Paper 2:**
+- `POST /api/paper2/submit-meta` - Submit Paper 2 metadata
+- `PUT /api/paper2/{id}/mark` - Mark Paper 2 (teacher)
+
+**PDF Exams:**
+- `POST /api/exams/create-pdf` - Create PDF exam
+- `POST /api/exams/{id}/upload-pdf/{lang}` - Upload PDF
+- `GET /api/exams/{id}/pdf/{lang}` - Get PDF
+
+Full API documentation: http://localhost:8001/api/docs
+
+---
+
+## 📊 Performance
+
+**Optimized for 1000+ concurrent users:**
+- MongoDB connection pooling (100 connections)
+- In-memory caching with TTLCache
+- Async/await for non-blocking I/O
+- Nginx rate limiting and caching
+- Frontend code splitting
+- Static asset caching (1 year)
+
+**Recommended Server Specs:**
+- CPU: 4 vCPUs
+- RAM: 8 GB
+- Disk: 160 GB SSD
+- MongoDB: Atlas M10 (Singapore region)
+
+---
+
+## 🌍 Multi-language Support
+
+Supported languages:
+- **Sinhala (si)** - සිංහල
+- **Tamil (ta)** - தமிழ்
+- **English (en)**
+
+Translations managed via i18next. Language switcher available on all pages.
+
+---
+
+## 🧪 Testing
+
+Backend tests:
+```bash
+cd backend
+source venv/bin/activate
+pytest backend_test.py
+```
+
+Frontend tests:
+```bash
+cd frontend
+yarn test
+```
+
+---
+
+## 📝 License
+
+Proprietary - © 2026 TEC Sri Lanka Worldwide (Pvt.) Ltd
+
+All rights reserved. This software is for use by Education Reforms Bureau only.
+
+---
+
+## 🤝 Contact
+
+**Education Reforms Bureau**  
+Established: 1982  
+Website: www.tecaikids.com  
+Email: info@educationreforms.cloud
+
+---
+
+## 🙏 Acknowledgments
+
+- Built for Sri Lankan students preparing for Grade 5 Scholarship Exams
+- Serving grades 2-5 with comprehensive skill tracking
+- Designed for 1000+ concurrent users
+- Developed with ❤️ for the future of education
+
+---
+
+**Version:** 2.0.0  
+**Last Updated:** February 2026  
+**Status:** Production Ready ✅

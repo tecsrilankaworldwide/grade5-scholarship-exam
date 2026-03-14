@@ -951,3 +951,261 @@ if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get('PORT', 8001))
     uvicorn.run(app, host="0.0.0.0", port=port)
+
+
+# ============================================================================
+# EMAIL NOTIFICATIONS & EXPORTS
+# ============================================================================
+
+from email_service import EmailService
+from export_service import ExportService
+from fastapi.responses import StreamingResponse
+import io
+
+@app.post("/api/notifications/send-test-email")
+async def send_test_email(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Send a test email to verify email configuration (Admin only)"""
+    user = await get_current_user(credentials)
+    if user["role"] != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    test_email = os.getenv("SMTP_EMAIL", "exams@tecsrilanka.com.lk")
+    success = EmailService.send_exam_published_notification(
+        parent_email=test_email,
+        student_name="Test Student",
+        exam_title="Test Exam",
+        exam_date=datetime.now().strftime("%Y-%m-%d"),
+        grade="Grade 5",
+        language="si"
+    )
+    
+    return {
+        "success": success,
+        "message": "Test email sent successfully" if success else "Failed to send test email",
+        "sent_to": test_email
+    }
+
+@app.post("/api/notifications/exam-published/{exam_id}")
+async def notify_exam_published(
+    exam_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Send notifications when exam is published (Teacher/Admin only)"""
+    user = await get_current_user(credentials)
+    if user["role"] not in [UserRole.TEACHER, UserRole.ADMIN]:
+        raise HTTPException(status_code=403, detail="Teacher/Admin access required")
+    
+    # Get exam details
+    exam = await db.exams.find_one({"exam_id": exam_id})
+    if not exam:
+        raise HTTPException(status_code=404, detail="Exam not found")
+    
+    # Get all students in this grade
+    students = await db.users.find({
+        "role": UserRole.STUDENT,
+        "grade": exam["grade"]
+    }).to_list(1000)
+    
+    sent_count = 0
+    failed_count = 0
+    
+    for student in students:
+        parent_email = student.get("parent_email")
+        if parent_email:
+            success = EmailService.send_exam_published_notification(
+                parent_email=parent_email,
+                student_name=student.get("full_name", "Student"),
+                exam_title=exam["title"],
+                exam_date=exam.get("created_at", datetime.now()).strftime("%Y-%m-%d"),
+                grade=exam["grade"],
+                language=student.get("preferred_language", "si")
+            )
+            if success:
+                sent_count += 1
+            else:
+                failed_count += 1
+    
+    return {
+        "success": True,
+        "sent": sent_count,
+        "failed": failed_count,
+        "total_students": len(students)
+    }
+
+@app.get("/api/reports/export-results/{exam_id}")
+async def export_exam_results(
+    exam_id: str,
+    format: str = "excel",
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Export exam results to Excel or PDF (Teacher/Admin only)"""
+    user = await get_current_user(credentials)
+    if user["role"] not in [UserRole.TEACHER, UserRole.ADMIN]:
+        raise HTTPException(status_code=403, detail="Teacher/Admin access required")
+    
+    # Get exam details
+    exam = await db.exams.find_one({"exam_id": exam_id})
+    if not exam:
+        raise HTTPException(status_code=404, detail="Exam not found")
+    
+    # Get all attempts for this exam
+    attempts = await db.attempts.find({
+        "exam_id": exam_id,
+        "status": "completed"
+    }).to_list(1000)
+    
+    # Prepare results data
+    results = []
+    for attempt in attempts:
+        student = await db.users.find_one({"email": attempt["student_email"]})
+        results.append({
+            "student_name": student.get("full_name", "") if student else "",
+            "email": attempt["student_email"],
+            "score": attempt.get("score", 0),
+            "percentage": round((attempt.get("score", 0) / exam["total_questions"]) * 100, 1),
+            "status": "Passed" if (attempt.get("score", 0) / exam["total_questions"]) >= 0.5 else "Needs Improvement"
+        })
+    
+    if format == "excel":
+        # Export to Excel
+        excel_data = ExportService.export_exam_results_to_excel(
+            exam_title=exam["title"],
+            grade=exam["grade"],
+            results=results,
+            skill_areas=SKILL_AREAS
+        )
+        
+        return StreamingResponse(
+            io.BytesIO(excel_data),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename=exam_results_{exam_id}.xlsx"}
+        )
+    else:
+        raise HTTPException(status_code=400, detail="Only Excel format supported currently")
+
+@app.get("/api/reports/student-monthly/{student_email}/{month}")
+async def export_student_monthly_report(
+    student_email: str,
+    month: str,  # Format: YYYY-MM
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Export monthly student report as PDF (Parent/Teacher/Admin)"""
+    user = await get_current_user(credentials)
+    
+    # Check permissions
+    if user["role"] == UserRole.STUDENT and user["email"] != student_email:
+        raise HTTPException(status_code=403, detail="Access denied")
+    if user["role"] == UserRole.PARENT:
+        student = await db.users.find_one({"email": student_email})
+        if not student or student.get("parent_email") != user["email"]:
+            raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get student info
+    student = await db.users.find_one({"email": student_email})
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    
+    # Get attempts for the month
+    from datetime import datetime
+    start_date = datetime.strptime(f"{month}-01", "%Y-%m-%d")
+    if start_date.month == 12:
+        end_date = datetime(start_date.year + 1, 1, 1)
+    else:
+        end_date = datetime(start_date.year, start_date.month + 1, 1)
+    
+    attempts = await db.attempts.find({
+        "student_email": student_email,
+        "status": "completed",
+        "submitted_at": {
+            "$gte": start_date,
+            "$lt": end_date
+        }
+    }).to_list(100)
+    
+    # Calculate statistics
+    exams_data = []
+    total_score = 0
+    for attempt in attempts:
+        exam = await db.exams.find_one({"exam_id": attempt["exam_id"]})
+        if exam:
+            percentage = round((attempt.get("score", 0) / exam["total_questions"]) * 100, 1)
+            total_score += percentage
+            exams_data.append({
+                "title": exam["title"],
+                "date": attempt["submitted_at"].strftime("%Y-%m-%d"),
+                "score": attempt.get("score", 0),
+                "total": exam["total_questions"],
+                "percentage": percentage
+            })
+    
+    avg_score = round(total_score / len(exams_data), 1) if exams_data else 0
+    
+    # Get skill breakdown
+    skill_breakdown = {}
+    for skill in SKILL_AREAS:
+        skill_scores = [a.get("skill_scores", {}).get(skill, 0) for a in attempts if "skill_scores" in a]
+        skill_breakdown[skill] = round(sum(skill_scores) / len(skill_scores), 1) if skill_scores else 0
+    
+    overall_stats = {
+        "exams_taken": len(exams_data),
+        "average_score": avg_score,
+        "highest_score": max([e["percentage"] for e in exams_data]) if exams_data else 0,
+        "lowest_score": min([e["percentage"] for e in exams_data]) if exams_data else 0
+    }
+    
+    # Generate PDF
+    pdf_data = ExportService.export_student_report_to_pdf(
+        student_name=student.get("full_name", "Student"),
+        grade=student.get("grade", ""),
+        month=month,
+        exams_data=exams_data,
+        skill_breakdown=skill_breakdown,
+        overall_stats=overall_stats
+    )
+    
+    return StreamingResponse(
+        io.BytesIO(pdf_data),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=report_{student_email}_{month}.pdf"}
+    )
+
+@app.post("/api/settings/branding")
+async def update_branding(
+    branding: Dict,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Update platform branding (Admin only)"""
+    user = await get_current_user(credentials)
+    if user["role"] != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Update or create branding document
+    await db.branding.update_one(
+        {"_id": "main"},
+        {"$set": {
+            "institution_name": branding.get("institution_name", "Education Reforms Bureau"),
+            "portal_name": branding.get("portal_name", "Grade 5 Scholarship Exam Portal"),
+            "tagline": branding.get("tagline", "Building Future Scholars"),
+            "primary_color": branding.get("primary_color", "#F97316"),
+            "secondary_color": branding.get("secondary_color", "#3B82F6"),
+            "updated_at": datetime.now(timezone.utc)
+        }},
+        upsert=True
+    )
+    
+    return {"success": True, "message": "Branding updated successfully"}
+
+@app.get("/api/settings/branding")
+async def get_branding():
+    """Get platform branding (Public)"""
+    branding = await db.branding.find_one({"_id": "main"})
+    if not branding:
+        return {
+            "institution_name": "Education Reforms Bureau",
+            "portal_name": "Grade 5 Scholarship Exam Portal",
+            "tagline": "Building Future Scholars",
+            "primary_color": "#F97316",
+            "secondary_color": "#3B82F6"
+        }
+    return branding
+

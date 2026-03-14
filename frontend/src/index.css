@@ -97,6 +97,47 @@ code {
 }
 
 @layer utilities {
+  /* Mobile Responsive Utilities */
+  .mobile-container {
+    @apply px-4 py-6 sm:px-6 lg:px-8;
+  }
+  
+  .mobile-card {
+    @apply w-full rounded-lg shadow-md p-4 sm:p-6;
+  }
+  
+  .mobile-button {
+    @apply w-full sm:w-auto px-4 py-3 text-base sm:text-sm;
+  }
+  
+  .mobile-text {
+    @apply text-base sm:text-sm;
+  }
+  
+  .mobile-heading {
+    @apply text-xl sm:text-2xl lg:text-3xl;
+  }
+  
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  .mobile-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4;
+  }
+  
+  .mobile-stack {
+    @apply flex flex-col space-y-4;
+  }
+  
+  .hide-mobile {
+    @apply hidden sm:block;
+  }
+  
+  .show-mobile {
+    @apply block sm:hidden;
+  }
+  
   /* Kid-friendly academic backgrounds */
   .bg-lined-paper {
     background-image: linear-gradient(to bottom, rgba(249, 202, 103, 0.18) 1px, transparent 1px);

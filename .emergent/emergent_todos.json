@@ -1,18 +1,18 @@
 [
   {
-    "content": "Phase 8: Test the application and take screenshots",
+    "content": "Option B: Create Full Desktop App with Electron - Structure created",
     "status": "completed"
   },
   {
-    "content": "Phase 9: Create comprehensive documentation for academic board",
-    "status": "completed"
+    "content": "Create master installation guide comparing all 3 options",
+    "status": "in_progress"
   },
   {
-    "content": "Phase 10: Prepare for GitHub push - all code ready",
-    "status": "completed"
+    "content": "Create final package summary document",
+    "status": "pending"
   },
   {
-    "content": "FINAL: User to provide classic tokens and push to GitHub",
+    "content": "Push everything to GitHub",
     "status": "pending"
   }
 ]

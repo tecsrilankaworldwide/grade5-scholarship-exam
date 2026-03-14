@@ -1,164 +1,146 @@
-# Grade 5 Scholarship Exam Platform — Completion Plan (Remaining 50%)
+# Plan — Grade 5 Scholarship Platform Enhancements (Mobile, Analytics, Email, Reporting, Branding)
 
-## 1) Objectives (Phase 2 Focus)
-- Deliver complete, production-ready frontend for all roles (Student, Teacher, Parent, Admin, Typesetter)
-- Implement robust MCQ exam taking UI with timer, autosave, and resume
-- Build Teacher exam creation/publish flows (MCQ) and Paper 2 marking UI
-- Build Parent progress (“blood-report” style) with charts and trends
-- Complete Typesetter PDF exam upload/preview per language (si/ta/en)
-- Ensure i18n is wired across primary pages; existing language support is sufficient
-- One round of comprehensive end-to-end testing and fixes
-
-Notes:
-- Backend core is already complete and live (auth, exams, attempts, pdf endpoints, progress).
-- All frontend API calls must use REACT_APP_BACKEND_URL + "/api" prefix.
+## Objectives
+- Improve UX on phones/tablets (students/parents/teachers) without breaking existing flows.
+- Add deeper month-to-month analytics on 10 skill areas ("blood test" concept).
+- Add parent email notifications (exam published, results ready, monthly summary).
+- Add advanced reporting: Excel export + printable PDF report.
+- Add configurable branding (logo/colors/name) for Education Reforms Bureau / customer instances.
+- End every phase with e2e test + GitHub push checkpoint.
 
 ---
 
-## 2) Phases, User Stories, and Implementation Steps
+## Phase 1 — POC: Email + Reporting Exports (core risky integrations)
+> External integrations + file generation are most failure-prone; validate in isolation first.
 
-### Phase 1 — Core POC (Decision: Skip, backend core is implemented and verified)
-- Rationale: No external OAuth or complex 3rd-party integration; core flows already implemented server-side.
-- Still perform a quick smoke validation before UI build:
-  - Story P1-1: As a student (student@test.com / student123), I can POST /api/login and receive a JWT.
-  - Story P1-2: As a student, I can GET /api/exams?grade=grade_5&status=published and see sample exams.
-  - Story P1-3: As a student, I can POST /api/exams/{examId}/start and receive attempt + questions.
-  - Story P1-4: As a student, I can POST /api/attempts/{attemptId}/save to persist an answer.
-  - Story P1-5: As a student, I can POST /api/attempts/{attemptId}/submit and receive score + skill breakdown.
-- Exit Criteria: All smoke checks return 200 with valid payloads.
+### User stories
+1. As an admin, I want to send a test email so I can confirm deliverability before enabling notifications.
+2. As a parent, I want to receive an email when results are ready so I don’t miss progress updates.
+3. As a teacher, I want to export an exam’s results to Excel so I can share with academics.
+4. As a parent, I want a PDF report of monthly skill performance so I can print/share.
+5. As an admin, I want failures logged clearly so issues can be fixed quickly.
 
-### Phase 2 — App Development (Frontend completion + UX polish)
+### Implementation steps
+- Web research: best practice for FastAPI email (SendGrid vs SMTP), rate limits, templates.
+- Add isolated backend scripts:
+  - `scripts/test_email_send.py` (SendGrid or SMTP) using env vars only.
+  - `scripts/test_export_excel.py` create XLSX from sample aggregation.
+  - `scripts/test_export_pdf.py` generate a minimal PDF report.
+- Choose libraries:
+  - Email: SendGrid SDK **or** SMTP via `aiosmtplib` (decide based on ops).
+  - Excel: `openpyxl`.
+  - PDF: `reportlab` (simple) or `weasyprint` (html->pdf; heavier).
+- Define env template additions (no secrets committed).
+- Success gate: scripts run successfully in this environment.
 
-User Stories (at least 10 key flows):
-1. As a student, I can see all published exams for my grade and start one with a 60-minute countdown.
-2. As a student, my answers autosave every few seconds and persist on refresh (resume support).
-3. As a student, I can submit and immediately see my Paper 1 score and skill percentages.
-4. As a teacher, I can create a 60-question MCQ exam with skill tags and publish it.
-5. As a teacher, I can mark Paper 2 (essay + 10 short answers), set marks, and save comments.
-6. As a parent, I can view my child’s monthly progress with skill trends and strengths/weaknesses.
-7. As an admin, I can list users, create a new user, and deactivate/reactivate users.
-8. As a typesetter, I can create a PDF exam and upload PDFs for si/ta/en, then preview them.
-9. As any user, I can switch language (where supported keys exist) without breaking primary flows.
-10. As a student, I can resume an in-progress attempt if my connection drops or I reload the page.
-
-Implementation Steps (high level):
-A. Foundation
-- Add axios interceptor to inject Authorization: Bearer <token> from AuthContext
-- Ensure all clickable controls have data-testid attributes for testing
-- Confirm i18n is initialized (src/i18n) and LanguageSwitcher is available globally where needed
-
-B. Student Exam Interface (src/pages/ExamInterface.js)
-- Implement timer (countdown from exam.duration_minutes) with localStorage backup
-- Autosave: on option select and every N seconds → POST /api/attempts/{attemptId}/save
-- Question navigator/palette, flag-for-review, and progress display
-- Submit flow with confirmation; on success show score + skill_percentages
-
-C. Teacher Portal
-- ExamCreator (src/components/ExamCreator.js): build 60 MCQs with 5 options + skill tags
-- Save draft via POST /api/exams/create; publish via PUT /api/exams/{id}/publish
-- Paper 2: Paper2Marking (src/components/Paper2Marking.js) to fetch pending submissions and save marks via PUT /api/paper2/{submissionId}/mark
-
-D. Parent Dashboard (src/pages/ParentDashboard.js)
-- Fetch GET /api/students/{student_id}/progress
-- Render charts (Recharts) for monthly progress + skill trends
-- Show strengths/weaknesses blocks
-
-E. Admin Dashboard (src/pages/AdminDashboard.js)
-- Basic user CRUD: list, create, toggle active (minimal UI per scope)
-- Optional: simple filters by role/grade
-
-F. Typesetter Dashboard (src/pages/TypesetterDashboard.js)
-- Create PDF exam via POST /api/exams/create-pdf
-- Upload one PDF per language via POST /api/exams/{id}/upload-pdf/{language}
-- Preview via GET /api/exams/{id}/pdf/{language} in an embed/link
-
-G. i18n
-- Keep existing keys; ensure all major UI labels use t('...')
-- Fallback to English keys if missing in si/ta
-
-H. Design and Polish
-- Call design_agent for UI audit and apply adjustments without breaking flows
-- Ensure consistent spacing, accessible contrast, and clear states (loading/errors)
-
-I. Testing & QA
-- Use testing_agent to cover:
-  - Auth login for each role
-  - Student exam start → autosave → resume → submit
-  - Teacher create/publish; Paper 2 marking
-  - Parent progress charts render
-  - Typesetter PDF upload + preview
-- Fix all issues found; re-run until green
-
-Exit Criteria (Phase 2): All user stories pass via end-to-end tests; no console or 500 errors; UI consistent.
+### Success criteria
+- Test email arrives to a real mailbox.
+- Excel export opens with correct columns + sample rows.
+- PDF renders and downloads with correct headings + a small chart/table.
 
 ---
 
-## STATUS: ✅ PHASE 2 COMPLETE - All Features Implemented and Tested
+## Phase 2 — V1 App Development: Mobile Responsiveness + Analytics (no new auth)
 
-The remaining 50% has been successfully completed! All user stories have been implemented and tested.
+### User stories
+1. As a student, I want the MCQ exam UI to fit my phone screen so I can answer without zooming.
+2. As a student, I want the question navigator to be usable on mobile so I can jump quickly.
+3. As a parent, I want to see month-to-month skill trends so I understand improvement/decline.
+4. As a teacher, I want a class/grade analytics view so I can spot weak skill areas.
+5. As an admin, I want dashboards to load fast even with many attempts.
 
-### Completed Work:
-✅ Phase 2.1: Fixed ExamInterface with proper API calls, timer with localStorage, autosave, resume logic
-✅ Phase 2.2: Complete ExamCreator component - 60 MCQ questions with skill mapping
-✅ Phase 2.3: Complete Paper2Marking component - essay + 10 short answers marking
-✅ Phase 2.4: Complete ParentDashboard - progress charts, skill trends, strengths/weaknesses
-✅ Phase 2.5: Complete AdminDashboard - user management (list, create users)
-✅ Phase 2.6: TypesetterDashboard verified - PDF upload for 3 languages working
-✅ Phase 2.7: Axios interceptor added for automatic auth token injection
-✅ Phase 2.8: i18n translations working across all pages
-✅ Phase 2.9: Design audit completed with guidelines provided
-✅ Phase 2.10: Comprehensive end-to-end testing completed
-✅ Phase 2.11: All bugs found by testing agent fixed
+### Implementation steps
+- Mobile-first UI pass (Tailwind):
+  - Audit key pages: Login, Student exam, Results, Parent dashboard, Teacher dashboard.
+  - Add responsive layouts: `flex-col` on small screens, sticky footer actions, collapsible sidebars.
+  - Improve touch targets, font scaling, and horizontal overflow fixes.
+- Analytics (backend + frontend):
+  - Add optimized aggregation endpoints (Mongo pipelines) for:
+    - student monthly trend per skill
+    - overall score trend
+    - grade-level distribution (optional)
+  - Frontend: add charts (Recharts) for trends + skill radar comparison per month.
+  - Cache heavy endpoints with TTL cache already present.
+- Conclude with 1 round of e2e testing (student takes exam on mobile viewport + parent views trends).
 
-### Testing Results:
-- Backend: 100% tests passing (14/14)
-- Frontend: 85% core flows working
-- Critical bug in exam submission FIXED by testing agent
-- Empty exam handling added
-- Exam publish validation added
-- ESLint conflicts resolved
-
-### Known Working Features:
-✅ Student login and dashboard
-✅ Exam taking with 60-minute timer
-✅ Autosave every 10 seconds
-✅ Resume exam support
-✅ Question navigator and flag system
-✅ Submit exam and view results with skill breakdown
-✅ Teacher exam creation (60 questions with options)
-✅ Teacher exam publishing
-✅ Paper 2 marking interface
-✅ Parent progress dashboard with charts
-✅ Admin user management
-✅ Typesetter PDF upload
-
-## 3) Next Actions (Execution Order)
-1) Backend dependency fix (done): ensure cachetools installed and backend running
-2) Frontend dependencies: yarn add recharts dayjs (timer utilities) if missing
-3) Implement axios auth interceptor and error handler
-4) Complete Student ExamInterface: timer, autosave, resume, submit result view
-5) Finalize Teacher ExamCreator and publish flow; wire Paper2Marking
-6) Complete ParentDashboard charts and strengths/weaknesses
-7) Complete Admin basic user management views
-8) Finalize Typesetter PDF create/upload/preview
-9) Run design_agent and apply quick UI polish
-10) Run testing_agent for full E2E, fix issues, re-run
+### Success criteria
+- All key screens usable at 360px width (no broken layout).
+- Parent dashboard shows month comparison and per-skill trend.
+- No major regression in exam-taking flow.
 
 ---
 
-## 4) Success Criteria
-- All listed user stories demonstrably working on the preview URL
-- No broken routes; all API calls prefixed with /api and use env URL
-- Exam timer, autosave, and resume robust across refreshes
-- Paper 1 results show score + skill percentages; Paper 2 marking persisted
-- Parent progress charts render accurate data for months and skills
-- Typesetter PDF workflow usable for si/ta/en with preview
-- i18n doesn’t block core flows; language switch works where keys exist
-- Testing agent scenarios pass without critical or high issues remaining
+## Phase 3 — Add Features: Notifications + Exports in the App
+
+### User stories
+1. As a parent, I want an email when an exam is published so I can remind my child.
+2. As a parent, I want an email summary after submission so I can track completion.
+3. As a teacher, I want to export results to Excel filtered by grade/month.
+4. As an admin, I want to download a PDF monthly report for a student.
+5. As a user, I want downloads to work on mobile too.
+
+### Implementation steps
+- Email notifications:
+  - Add backend notification service + template rendering.
+  - Trigger points: exam publish, results ready, monthly summary (manual trigger first; scheduled later).
+  - Add admin UI toggle: enable/disable notifications + test-send.
+- Reporting:
+  - Backend endpoints:
+    - `GET /reports/student/{id}/month/{yyyy-mm}.pdf`
+    - `GET /reports/grade/{grade}/month/{yyyy-mm}.xlsx`
+  - Frontend buttons in Teacher/Admin/Parent dashboards.
+- Conclude with e2e testing: publish exam → submit → email → export XLSX/PDF.
+
+### Success criteria
+- Emails send successfully and failures are visible in logs/UI.
+- Exported XLSX/PDF match the selected filters and open reliably.
 
 ---
 
-## References
-- Backend endpoints present in backend/server.py
-- Frontend pages and components under frontend/src/
-- Test credentials pre-seeded: student@test.com/student123, teacher@test.com/teacher123, parent@test.com/parent123, admin@test.com/admin123
+## Phase 4 — Branding Customization (MVP)
+
+### User stories
+1. As an admin, I want to upload a logo so the portal matches our institution.
+2. As an admin, I want to set primary/secondary colors so UI matches branding.
+3. As an admin, I want to edit portal name/tagline so it’s official.
+4. As a user, I want branding to persist across sessions.
+5. As a developer, I want branding config to be environment-based for deployments.
+
+### Implementation steps
+- Branding model in DB (single document): name, tagline, colors, logo URL.
+- Backend endpoints: get/update branding, upload logo (store under `uploads/branding`).
+- Frontend: apply theme vars (CSS variables) + logo in header/login.
+- Conclude with e2e testing: update branding → refresh → persists.
+
+### Success criteria
+- Branding updates apply without rebuild and persist.
+- No visual regressions across roles.
+
+---
+
+## Phase 5 — Hardening, QA, GitHub Push
+
+### User stories
+1. As a user, I want the app to remain stable after updates.
+2. As an admin, I want a checklist to confirm features before launch.
+3. As a teacher, I want exports to be accurate for official review.
+4. As a parent, I want emails to be reliable and not spammy.
+5. As an operator, I want secrets managed safely.
+
+### Implementation steps
+- Regression testing across roles + mobile viewport.
+- Performance check on analytics endpoints; add indexes if needed.
+- Security review for downloads + role-based access.
+- Update docs: `.env.example`, QUICK_START, deployment notes.
+- Push working changes to GitHub (commit per phase).
+
+### Success criteria
+- All new features pass e2e tests.
+- GitHub contains latest working version with updated env templates/docs.
+
+---
+
+## Next actions (immediate)
+1. Choose email provider for POC: **SendGrid** (recommended) or **SMTP** (Gmail/SES).
+2. Provide a test email address to receive POC emails.
+3. Confirm report scope for exports (Student monthly PDF + Grade monthly Excel as default).
